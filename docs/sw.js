@@ -1,5 +1,5 @@
 // Service worker: guarda el juego en el celular para jugar sin internet.
-const CACHE = 'sigilo-202611080954';
+const CACHE = 'sigilo-202611081439';
 const LOCAL = ['./', 'index.html', 'manifest.json', 'pedro_model.js', 'clara_model.js', 'vigia_model.js', 'sereno_model.js',
   'zorro_model.js', 'corona_model.js', 'escenario_model.js', 'trasandino_model.js', 'playa_model.js', 'icons/icon-192.png', 'icons/icon-512.png'];
 const CDN = ['https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',

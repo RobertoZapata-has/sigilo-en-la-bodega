@@ -279,7 +279,8 @@ canvas#c { position: absolute; inset: 0; width: 100%; height: 100%; display: blo
 .ios-help { width: min(380px, 100%); background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 22px; text-align: center; }
 .ios-help h2 { font-family: var(--display); font-style: italic; font-size: 28px; margin: 4px 0 10px; }
 .ios-help ol { text-align: left; line-height: 1.6; color: #d7d3e6; padding-left: 22px; margin: 0 0 18px; }
-.ios-help svg { width: 18px; height: 18px; vertical-align: -3px; stroke: var(--gold-hi); fill: none; stroke-width: 1.8; }
+.ios-help svg { width: 18px; height: 18px; vertical-align: -3px; stroke: var(--gold-hi); fill: var(--gold-hi); stroke-width: 1.8; }
+.ios-help svg path { fill: none; }
 
 /* hoja de ruta (niveles) */
 .sheet { place-items: end center; padding: 0; }
@@ -493,15 +494,12 @@ canvas#c { position: absolute; inset: 0; width: 100%; height: 100%; display: blo
 
   <div class="overlay" id="iosHelp" hidden style="z-index:12">
     <div class="ios-help">
-      <div class="eyebrow">Instalar en iPhone o iPad</div>
+      <div class="eyebrow" id="ihWho">Instalar el juego</div>
       <h2>Llevalo en la pantalla de inicio</h2>
-      <ol>
-        <li>Tocá el botón <b>Compartir</b> <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 12v8h14v-8"/></svg> de Safari.</li>
-        <li>Elegí <b>Agregar a inicio</b>.</li>
-        <li>Abrilo desde el ícono: se juega a pantalla completa y sin internet.</li>
-      </ol>
+      <ol id="ihSteps"></ol>
       <button class="btn-main" id="iosOk" style="width:100%">Entendido</button>
     </div>
+  </div>
   </div>
 </div>
 
@@ -519,16 +517,36 @@ canvas#c { position: absolute; inset: 0; width: 100%; height: 100%; display: blo
 // ---------- Instalar como app (PWA) ----------
 (() => {
   const btns = [document.getElementById('pkInstall'), document.getElementById('lvInstall')];
-  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const mm = q => matchMedia(q).matches;
+  const standalone = mm('(display-mode: standalone)') || mm('(display-mode: fullscreen)') || mm('(display-mode: minimal-ui)') || navigator.standalone;
+  const ua = navigator.userAgent;
+  const ios = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const samsung = /SamsungBrowser/i.test(ua), android = /android/i.test(ua);
+  const dots = '<svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>';
+  const share = '<svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 12v8h14v-8"/></svg>';
+  const burger = '<svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
+  const steps = ios ? ['En iPhone o iPad', ['Abrí esta página en <b>Safari</b>.', 'Tocá <b>Compartir</b> ' + share + '.', 'Elegí <b>Agregar a inicio</b>.']]
+    : samsung ? ['En el navegador de Samsung', ['Tocá el menú ' + burger + ' de abajo a la derecha.', 'Elegí <b>Agregar página a</b> y después <b>Pantalla de inicio</b>.', 'Si te ofrece <b>Instalar</b>, aceptá: queda como app.']]
+    : android ? ['En Chrome', ['Tocá el menú ' + dots + ' de arriba a la derecha.', 'Elegí <b>Instalar aplicación</b> (o <b>Agregar a la pantalla principal</b>).', 'Si ya la instalaste, buscá el ícono del sello en tu pantalla.']]
+    : ['En la computadora', ['En Chrome o Edge, tocá el ícono de instalar ⊕ en la barra de direcciones.', 'O el menú ' + dots + ' → <b>Instalar Sigilo en la bodega</b>.']];
   let deferred = null;
   const show = on => btns.forEach(b => { if (b) b.hidden = !on; });
-  if (!standalone && ios) show(true);
+  // el botón está siempre (salvo cuando ya estás jugando desde la app instalada)
+  show(!standalone);
   addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; show(true); });
   addEventListener('appinstalled', () => { deferred = null; show(false); });
+  const help = () => {
+    document.getElementById('ihWho').textContent = steps[0];
+    document.getElementById('ihSteps').innerHTML = steps[1].map(x => '<li>' + x + '</li>').join('') + '<li>Abrilo desde el ícono: se juega a pantalla completa y sin internet.</li>';
+    document.getElementById('iosHelp').hidden = false;
+  };
   btns.forEach(b => b && b.addEventListener('click', async () => {
-    if (deferred) { deferred.prompt(); const r = await deferred.userChoice; if (r.outcome === 'accepted') show(false); deferred = null; }
-    else if (ios) document.getElementById('iosHelp').hidden = false;
+    if (deferred) {
+      try { deferred.prompt(); const r = await deferred.userChoice; deferred = null; if (r.outcome === 'accepted') { show(false); return; } }
+      catch (e) { deferred = null; }
+      return;
+    }
+    help();
   }));
   document.getElementById('iosOk').onclick = () => { document.getElementById('iosHelp').hidden = true; };
   if ('serviceWorker' in navigator && location.protocol === 'https:' && !location.hostname.endsWith('claude.ai') && !location.hostname.includes('claudeusercontent'))
