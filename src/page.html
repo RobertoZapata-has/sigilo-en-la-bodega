@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sigilo en la bodega</title>
+<meta name="description" content="Puzzle de sigilo por turnos. Mendoza, 1974: seguí a la banda del Zorro Funes sin que te vean.">
+<meta name="theme-color" content="#12162b">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sigilo">
+<title>Sigilo en la bodega</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,700;1,6..96,500;1,6..96,700&family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Etiqueta de vino de noche: el tablero ocupa toda la pantalla; arriba la etiqueta del nivel y el sello de lacre, abajo una botonera flotante */
+:root {
+  --night: #12162b;
+  --dusk: #3a3f63;
+  --horizon: #8b6c7c;
+  --panel: rgba(13, 16, 32, 0.86);
+  --parch: #efe3c8;
+  --parch-ink: #2b2117;
+  --muted: #a7acc6;
+  --gold: #d8b25e;
+  --gold-hi: #f1d690;
+  --malbec: #7a1f36;
+  --malbec-hi: #a8354f;
+  --line: rgba(216, 178, 94, 0.32);
+  --display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --label: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  margin: 0; overflow: hidden;
+  background: var(--night); color: var(--parch);
+  font-family: var(--body); font-size: 15px;
+  -webkit-tap-highlight-color: transparent;
+}
+button { font: inherit; color: inherit; }
+button:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 3px; }
+.app { position: relative; height: 100%; overflow: hidden; }
+
+/* ---------- escena ---------- */
+.stage {
+  position: absolute; inset: 0;
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 120' preserveAspectRatio='none'><path d='M0 120 L0 78 L38 52 L62 66 L104 24 L131 48 L158 36 L196 70 L232 30 L262 54 L300 16 L338 58 L366 46 L400 70 L400 120 Z' fill='%23161a30'/><path d='M104 24 L114 33 L106 32 L98 30 Z M300 16 L311 27 L302 25 L292 23 Z M232 30 L240 38 L231 36 Z' fill='%23d9d3e0' opacity='.5'/></svg>") bottom / 100% 26% no-repeat,
+    radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,.7), transparent 60%),
+    radial-gradient(1px 1px at 33% 9%, rgba(255,255,255,.55), transparent 60%),
+    radial-gradient(1.5px 1.5px at 58% 14%, rgba(255,255,255,.6), transparent 60%),
+    radial-gradient(1px 1px at 81% 7%, rgba(255,255,255,.5), transparent 60%),
+    radial-gradient(1px 1px at 91% 23%, rgba(255,255,255,.45), transparent 60%),
+    linear-gradient(180deg, var(--night) 0%, var(--dusk) 62%, var(--horizon) 100%);
+}
+.stage[data-sky="tarde"] {
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 120' preserveAspectRatio='none'><path d='M0 120 L0 78 L38 52 L62 66 L104 24 L131 48 L158 36 L196 70 L232 30 L262 54 L300 16 L338 58 L366 46 L400 70 L400 120 Z' fill='%235b3f5c'/><path d='M104 24 L114 33 L106 32 L98 30 Z M300 16 L311 27 L302 25 L292 23 Z M232 30 L240 38 L231 36 Z' fill='%23ffe9d6' opacity='.7'/></svg>") bottom / 100% 30% no-repeat,
+    linear-gradient(180deg, #4d5f9a 0%, #c98a8a 52%, #f2b27a 82%, #ffd59a 100%);
+}
+.stage[data-sky="anochecer"] {
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 120' preserveAspectRatio='none'><path d='M0 120 L0 78 L38 52 L62 66 L104 24 L131 48 L158 36 L196 70 L232 30 L262 54 L300 16 L338 58 L366 46 L400 70 L400 120 Z' fill='%23332a4a'/><path d='M104 24 L114 33 L106 32 L98 30 Z M300 16 L311 27 L302 25 L292 23 Z M232 30 L240 38 L231 36 Z' fill='%23e8d6e8' opacity='.6'/></svg>") bottom / 100% 30% no-repeat,
+    linear-gradient(180deg, #2c3358 0%, #5b4f7e 50%, #b07a8e 85%, #d89a86 100%);
+}
+.stage[data-sky="luna"] {
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 120' preserveAspectRatio='none'><path d='M0 120 L0 70 L30 48 L58 60 L92 18 L126 46 L150 34 L190 64 L226 22 L258 50 L296 10 L336 54 L364 40 L400 62 L400 120 Z' fill='%231a2140'/><path d='M92 18 L106 32 L96 30 L86 28 L80 30 Z M226 22 L238 34 L228 33 L218 31 Z M296 10 L312 26 L300 24 L288 22 L282 25 Z M150 34 L158 40 L148 40 Z' fill='%23eef2ff' opacity='.85'/></svg>") bottom / 100% 34% no-repeat,
+    radial-gradient(circle at 78% 17%, #fffbe9 0 3.2%, rgba(255,247,220,.55) 3.6%, rgba(255,240,200,.12) 9%, transparent 16%),
+    radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,.8), transparent 60%),
+    radial-gradient(1px 1px at 26% 30%, rgba(255,255,255,.55), transparent 60%),
+    radial-gradient(1.5px 1.5px at 41% 11%, rgba(255,255,255,.7), transparent 60%),
+    radial-gradient(1px 1px at 55% 24%, rgba(255,255,255,.5), transparent 60%),
+    radial-gradient(1px 1px at 64% 6%, rgba(255,255,255,.6), transparent 60%),
+    radial-gradient(1px 1px at 93% 30%, rgba(255,255,255,.5), transparent 60%),
+    linear-gradient(180deg, #0b1230 0%, #1d2a5a 55%, #44507e 88%, #6a6f93 100%);
+}
+.stage[data-sky="alba"] {
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 120' preserveAspectRatio='none'><path d='M0 120 L0 70 L30 48 L58 60 L92 18 L126 46 L150 34 L190 64 L226 22 L258 50 L296 10 L336 54 L364 40 L400 62 L400 120 Z' fill='%234a3a62'/><path d='M92 18 L106 32 L96 30 L86 28 L80 30 Z M226 22 L238 34 L228 33 L218 31 Z M296 10 L312 26 L300 24 L288 22 L282 25 Z M150 34 L158 40 L148 40 Z' fill='%23eef2ff' opacity='.85'/></svg>") bottom / 100% 34% no-repeat,
+    radial-gradient(ellipse at 50% 100%, rgba(255,190,140,.75), transparent 55%),
+    linear-gradient(180deg, #2a2f5e 0%, #6b5a8e 38%, #d48d98 72%, #ffc79a 100%);
+}
+canvas#c { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: manipulation; }
+
+/* ---------- etiqueta del nivel y sello ---------- */
+.hud {
+  position: absolute; left: 0; right: 0; top: 0; z-index: 3;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 26px;
+  background: linear-gradient(180deg, rgba(18,22,43,.92) 0%, rgba(18,22,43,.55) 60%, rgba(18,22,43,0) 100%);
+  pointer-events: none;
+}
+.plate { min-width: 0; }
+.eyebrow {
+  font-family: var(--label); font-weight: 600; font-size: 12px;
+  letter-spacing: .22em; text-transform: uppercase; color: var(--gold);
+}
+.hud h1 {
+  font-family: var(--display); font-style: italic; font-weight: 700;
+  font-size: clamp(26px, 7vw, 36px); line-height: 1.02; margin: 4px 0 8px;
+  color: var(--parch); text-wrap: balance;
+  text-shadow: 0 2px 14px rgba(0,0,0,.45);
+}
+.flourish { display: flex; align-items: center; gap: 8px; width: 150px; max-width: 60vw; }
+.flourish::before, .flourish::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }
+.flourish::after { background: linear-gradient(90deg, var(--gold), transparent); }
+.flourish i { width: 6px; height: 6px; transform: rotate(45deg); border: 1px solid var(--gold); }
+
+.seal {
+  flex-shrink: 0; width: 76px; height: 76px; border-radius: 50%;
+  display: grid; place-content: center; text-align: center;
+  background: radial-gradient(circle at 35% 30%, var(--malbec-hi), var(--malbec) 58%, #4d1022 100%);
+  box-shadow: 0 0 0 3px rgba(122,31,54,.55), 0 0 0 4px var(--gold), 0 8px 22px rgba(0,0,0,.45), inset 0 0 0 7px rgba(0,0,0,.14), inset 0 0 0 8px rgba(241,214,144,.35);
+  font-variant-numeric: tabular-nums;
+}
+.seal b { font-family: var(--label); font-weight: 600; font-size: 30px; line-height: 1; color: var(--parch); }
+.seal span { font-family: var(--label); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-hi); margin-top: 2px; }
+
+/* ---------- botonera ---------- */
+.dock {
+  position: absolute; left: 50%; transform: translateX(-50%); z-index: 3;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  width: min(480px, calc(100% - 32px));
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4px;
+  padding: 8px 8px 7px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 26px;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 12px 30px rgba(0,0,0,.4);
+}
+.db {
+  display: grid; justify-items: center; gap: 4px; padding: 2px 0 0;
+  background: none; border: 0; cursor: pointer;
+}
+.db .ic {
+  width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+  border: 1px solid var(--line); background: rgba(255,255,255,.03);
+  transition: background .15s, transform .1s;
+}
+.db svg { width: 21px; height: 21px; stroke: var(--gold-hi); fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.db .lb { font-family: var(--label); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.db:hover .ic { background: rgba(216,178,94,.12); }
+.db:active .ic { transform: scale(.94); }
+.db:disabled { opacity: .32; cursor: default; }
+.db.gold .ic { background: linear-gradient(180deg, var(--gold-hi), var(--gold)); border-color: transparent; }
+.db.gold svg { stroke: #2b1e08; }
+.db.gold .lb { color: var(--gold-hi); }
+.db[aria-pressed="true"] .ic { background: rgba(216,178,94,.22); border-color: var(--gold); }
+
+/* ---------- nota del nivel ---------- */
+.tip {
+  position: absolute; z-index: 2; left: 50%; transform: translateX(-50%) rotate(-.6deg);
+  bottom: calc(108px + env(safe-area-inset-bottom, 0px));
+  width: min(440px, calc(100% - 32px));
+  background: var(--parch); color: var(--parch-ink);
+  border-radius: 4px; padding: 12px 14px 14px;
+  box-shadow: 0 10px 26px rgba(0,0,0,.4);
+  transition: opacity .3s;
+}
+.tip::after { /* esquina doblada */
+  content: ""; position: absolute; right: 0; bottom: 0; width: 18px; height: 18px;
+  background: linear-gradient(135deg, #d8c9a6 50%, var(--night) 50%); border-top-left-radius: 3px;
+}
+.nt-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.nt-head span { font-family: var(--label); font-weight: 600; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--malbec); }
+.nt-head button { background: none; border: 0; padding: 2px 6px; font-size: 20px; line-height: 1; color: #7a6a52; cursor: pointer; }
+.tip p { margin: 0; font-size: 15px; line-height: 1.45; }
+
+.toast {
+  position: absolute; z-index: 4; left: 50%; transform: translateX(-50%);
+  top: calc(104px + env(safe-area-inset-top, 0px));
+  background: var(--malbec); color: var(--parch); border: 1px solid var(--gold);
+  border-radius: 999px; padding: 8px 16px; font-size: 14px; white-space: nowrap;
+  max-width: calc(100% - 32px); overflow: hidden; text-overflow: ellipsis;
+  box-shadow: 0 8px 20px rgba(0,0,0,.4);
+}
+
+/* ---------- capas ---------- */
+.overlay {
+  position: absolute; inset: 0; z-index: 5; display: grid; place-items: center;
+  padding: 16px; background: rgba(9, 11, 24, .62);
+  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+  overflow-y: auto;
+}
+.row { display: flex; gap: 10px; }
+.row > * { flex: 1; }
+.btn-main, .btn-alt {
+  border-radius: 999px; padding: 12px 14px; cursor: pointer;
+  font-family: var(--label); font-weight: 600; font-size: 15px; letter-spacing: .12em; text-transform: uppercase;
+}
+.btn-main { background: var(--malbec); color: var(--parch); border: 1px solid var(--malbec-hi); box-shadow: inset 0 0 0 2px rgba(241,214,144,.18); }
+.btn-main:hover { background: var(--malbec-hi); }
+.btn-alt { background: transparent; color: inherit; border: 1px solid currentColor; opacity: .85; }
+
+/* etiqueta de vino (victoria) */
+.label {
+  width: min(360px, 100%); text-align: center; color: var(--parch-ink);
+  background: var(--parch); border-radius: 6px; padding: 26px 22px 22px;
+  box-shadow: 0 18px 40px rgba(0,0,0,.5), inset 0 0 0 6px var(--parch), inset 0 0 0 7px #9b7a3c, inset 0 0 0 9px var(--parch), inset 0 0 0 10px #9b7a3c;
+}
+.label .vint { font-family: var(--label); font-weight: 600; font-size: 12px; letter-spacing: .3em; text-transform: uppercase; color: #8a6a2e; }
+.label h2 { font-family: var(--display); font-style: italic; font-weight: 700; font-size: 38px; margin: 6px 0 4px; color: var(--malbec); line-height: 1.05; }
+.grapes { display: flex; justify-content: center; gap: 6px; margin: 8px 0 10px; }
+.grapes svg { width: 34px; height: 40px; }
+.grapes .off { opacity: .22; filter: grayscale(1); }
+.label p { margin: 0 auto 6px; max-width: 30ch; line-height: 1.45; }
+.label .verdict { display: inline-block; font-family: var(--label); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; font-size: 12px; color: #6e5226; border-top: 1px solid #c5a96e; border-bottom: 1px solid #c5a96e; padding: 3px 10px; margin: 4px 0 18px; }
+.label .btn-alt { color: var(--parch-ink); }
+
+/* lacre (derrota) */
+.caught { width: min(360px, 100%); text-align: center; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 0 22px 22px; box-shadow: 0 18px 40px rgba(0,0,0,.5); }
+.caught .big-seal {
+  width: 88px; height: 88px; margin: -44px auto 10px; border-radius: 50%; display: grid; place-items: center;
+  background: radial-gradient(circle at 35% 30%, var(--malbec-hi), var(--malbec) 60%, #4d1022);
+  box-shadow: 0 0 0 4px var(--night), 0 0 0 5px var(--gold), 0 10px 24px rgba(0,0,0,.5);
+}
+.caught .big-seal svg { width: 40px; height: 40px; stroke: var(--gold-hi); fill: none; stroke-width: 1.6; }
+.caught h2 { font-family: var(--display); font-style: italic; font-weight: 700; font-size: 30px; margin: 0 0 6px; line-height: 1.1; text-wrap: balance; }
+.caught p { color: var(--muted); line-height: 1.45; margin: 0 0 18px; }
+.overlay.caught-wrap { padding-top: 64px; }
+
+/* cartel de capítulo */
+.chapter { text-align: center; max-width: 460px; padding: 0 8px; }
+.chapter .eyebrow { font-size: 13px; }
+.chapter h2 { font-family: var(--display); font-style: italic; font-weight: 700; font-size: clamp(34px, 9vw, 52px); line-height: 1.02; margin: 10px 0 14px; text-wrap: balance; }
+.chapter .flourish { margin: 0 auto 16px; width: 180px; }
+.chapter p { font-size: 17px; line-height: 1.55; color: #d7d3e6; margin: 0 auto 26px; max-width: 38ch; }
+.chapter .btn-main { min-width: 200px; }
+#chapBox { background: radial-gradient(ellipse at center, rgba(18,22,43,.86), rgba(9,11,24,.96)); }
+#chapBox.has-art { background: linear-gradient(180deg, rgba(9,11,24,.35) 0%, rgba(9,11,24,.55) 40%, rgba(9,11,24,.94) 78%), var(--art) center / cover no-repeat, var(--night); place-items: end center; padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px)); }
+#chapBox.has-art .chapter p { color: #ece6f6; text-shadow: 0 1px 8px rgba(0,0,0,.6); }
+#chapBox.has-art .chapter h2 { text-shadow: 0 3px 18px rgba(0,0,0,.6); }
+
+/* postal del lugar */
+.postal {
+  position: absolute; z-index: 4; left: 16px; top: calc(118px + env(safe-area-inset-top, 0px));
+  width: min(300px, calc(100% - 32px)); padding: 8px 8px 10px; border-radius: 4px;
+  background: #f4ead2; color: var(--parch-ink); box-shadow: 0 16px 36px rgba(0,0,0,.5);
+  transform: rotate(-2.2deg) translateX(-130%); opacity: 0; cursor: pointer;
+  transition: transform .55s cubic-bezier(.2,.9,.25,1.15), opacity .4s;
+}
+.postal.in { transform: rotate(-2.2deg) translateX(0); opacity: 1; }
+.postal.out { transform: rotate(-6deg) translate(-40%, -20px); opacity: 0; }
+.postal img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 2px; background: #2a2f52; }
+.postal .pc-cap { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 7px 4px 0; }
+.postal strong { font-family: var(--display); font-style: italic; font-weight: 700; font-size: 19px; line-height: 1.1; }
+.postal small { font-family: var(--label); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: #8a6a2e; white-space: nowrap; }
+.postal::before { /* estampilla */
+  content: ""; position: absolute; right: 14px; top: 14px; width: 34px; height: 40px; border-radius: 2px;
+  background: radial-gradient(circle at 50% 42%, #d8b25e 0 9px, transparent 10px), var(--malbec);
+  box-shadow: 0 0 0 3px #f4ead2, 0 0 0 4px rgba(122,31,54,.4); opacity: .92;
+}
+
+/* botón para instalar */
+.install { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.install svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.pk-install { justify-self: center; margin-top: 4px; min-width: 240px; }
+.ios-help { width: min(380px, 100%); background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 22px; text-align: center; }
+.ios-help h2 { font-family: var(--display); font-style: italic; font-size: 28px; margin: 4px 0 10px; }
+.ios-help ol { text-align: left; line-height: 1.6; color: #d7d3e6; padding-left: 22px; margin: 0 0 18px; }
+.ios-help svg { width: 18px; height: 18px; vertical-align: -3px; stroke: var(--gold-hi); fill: none; stroke-width: 1.8; }
+
+/* hoja de ruta (niveles) */
+.sheet { place-items: end center; padding: 0; }
+.route {
+  width: min(560px, 100%); max-height: 88%; overflow-y: auto;
+  background: var(--panel); border: 1px solid var(--line); border-bottom: 0; border-radius: 22px 22px 0 0;
+  padding: 20px 18px calc(18px + env(safe-area-inset-bottom, 0px));
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.route h2 { font-family: var(--display); font-style: italic; font-weight: 700; font-size: 30px; margin: 2px 0 14px; }
+.tt-head, .tt-row { display: grid; grid-template-columns: 34px 1fr 52px 64px; gap: 10px; align-items: center; }
+.tt-head { font-family: var(--label); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); padding: 0 10px 6px; border-bottom: 1px solid var(--line); }
+.tt-head span:nth-child(n+3), .tt-row .num { text-align: right; }
+.lvls { list-style: none; margin: 0 0 14px; padding: 0; }
+.tt-row {
+  width: 100%; background: none; border: 0; border-bottom: 1px dashed rgba(216,178,94,.2);
+  padding: 11px 10px; text-align: left; cursor: pointer; border-radius: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.tt-row:hover { background: rgba(216,178,94,.07); }
+.tt-row[aria-current="true"] { background: rgba(122,31,54,.35); box-shadow: inset 3px 0 0 var(--gold); }
+.tt-row .n { font-family: var(--label); font-weight: 600; font-size: 18px; color: var(--gold); width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; }
+.tt-row .t { min-width: 0; display: flex; align-items: center; gap: 10px; }
+.tt-row .tx { min-width: 0; }
+.tt-row .thumb { width: 56px; height: 34px; object-fit: cover; border-radius: 3px; flex-shrink: 0; box-shadow: 0 0 0 1px var(--line); }
+.tt-row .t strong { display: block; font-family: var(--display); font-style: italic; font-size: 18px; font-weight: 500; }
+.tt-row .t small { font-family: var(--label); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.tt-row .num { font-family: var(--label); font-size: 17px; }
+.tt-row .num.best { color: var(--gold-hi); }
+.note { font-size: 13px; color: var(--muted); line-height: 1.45; margin: 0 0 12px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); margin: 0 0 16px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+
+/* ---------- elegir personaje ---------- */
+.picker {
+  position: fixed; inset: 0; z-index: 10; overflow-y: auto;
+  background: radial-gradient(ellipse at 50% 30%, #2a2f52 0%, var(--night) 70%);
+  padding: calc(20px + env(safe-area-inset-top, 0px)) 16px calc(20px + env(safe-area-inset-bottom, 0px));
+  display: grid; place-items: center;
+}
+.pk-inner { width: min(560px, 100%); display: grid; gap: 10px; text-align: center; }
+.pk-inner h2 { font-family: var(--display); font-style: italic; font-weight: 700; font-size: clamp(30px, 8vw, 44px); margin: 2px 0 0; line-height: 1.05; text-wrap: balance; }
+.pk-inner .flourish { margin: 4px auto 2px; width: 160px; }
+.pk-inner > p { margin: 0 auto; color: #cfcbe0; max-width: 42ch; line-height: 1.5; }
+#pkCanvas { width: 100%; height: clamp(200px, 38vh, 360px); display: block; }
+.pk-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ticket {
+  position: relative; display: grid; grid-template-columns: 30px 1fr; text-align: left; cursor: pointer;
+  background: var(--parch); color: var(--parch-ink); border: 0; border-radius: 8px; padding: 0; overflow: hidden;
+  box-shadow: 0 10px 24px rgba(0,0,0,.35);
+  -webkit-mask: radial-gradient(circle 7px at 30px 0, transparent 98%, #000) top / 100% 51% no-repeat, radial-gradient(circle 7px at 30px 100%, transparent 98%, #000) bottom / 100% 51% no-repeat;
+          mask: radial-gradient(circle 7px at 30px 0, transparent 98%, #000) top / 100% 51% no-repeat, radial-gradient(circle 7px at 30px 100%, transparent 98%, #000) bottom / 100% 51% no-repeat;
+  transition: transform .15s;
+}
+.ticket:hover, .ticket:focus-visible { transform: translateY(-3px); }
+.tk-stub {
+  background: var(--c); color: #fff; display: grid; place-items: center;
+  border-right: 2px dashed rgba(43,33,23,.35);
+  font-family: var(--label); font-weight: 600; font-size: 11px; letter-spacing: .2em; writing-mode: vertical-rl; transform: rotate(180deg);
+}
+.tk-body { padding: 10px 12px 12px; display: grid; gap: 2px; min-width: 0; }
+.tk-label { font-family: var(--label); font-weight: 600; font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: #8a6a2e; }
+.ticket strong { font-family: var(--display); font-style: italic; font-weight: 700; font-size: 24px; line-height: 1.1; }
+.tk-desc { font-size: 13px; line-height: 1.35; color: #5c4c38; }
+.ticket[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--gold), 0 10px 24px rgba(0,0,0,.35); }
+
+@media (max-width: 420px) {
+  .seal { width: 64px; height: 64px; }
+  .seal b { font-size: 25px; }
+  .tip { bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
+  .pk-opts { gap: 8px; }
+  .ticket strong { font-size: 21px; }
+}
+/* Celular acostado: poca altura */
+@media (orientation: landscape) and (max-height: 520px) {
+  .hud { padding-top: calc(8px + env(safe-area-inset-top, 0px)); }
+  .hud h1 { font-size: 22px; margin-bottom: 4px; }
+  .seal { width: 58px; height: 58px; }
+  .seal b { font-size: 22px; }
+  .dock { width: min(400px, calc(100% - 32px)); padding: 5px 6px 4px; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+  .db .ic { width: 38px; height: 38px; }
+  .db .lb { font-size: 10px; }
+  .tip { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); left: auto; right: 16px; transform: none; width: min(340px, 45%); }
+  .picker { place-items: start center; }
+  .pk-inner > p { display: none; }
+  #pkCanvas { height: 44vh; }
+}
+@media (prefers-reduced-motion: reduce) { .tip, .ticket, .db .ic { transition: none; } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="uva" viewBox="0 0 34 40">
+      <path d="M17 7 C17 3 20 1 24 1 C23 5 20 7 17 7 Z" fill="#6f8a3c"/>
+      <path d="M17 7 V10" stroke="#5a4326" stroke-width="1.6"/>
+      <g fill="#6b2140">
+        <circle cx="9" cy="14" r="5"/><circle cx="17" cy="13" r="5"/><circle cx="25" cy="14" r="5"/>
+        <circle cx="13" cy="22" r="5"/><circle cx="21" cy="22" r="5"/>
+        <circle cx="17" cy="30" r="5"/>
+      </g>
+      <g fill="#c25b7c" opacity=".55"><circle cx="7.5" cy="12.5" r="1.4"/><circle cx="15.5" cy="11.5" r="1.4"/><circle cx="11.5" cy="20.5" r="1.4"/><circle cx="15.5" cy="28.5" r="1.4"/></g>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="app">
+  <div class="stage" id="stage">
+    <canvas id="c" aria-label="Tablero del nivel. Tocá un punto vecino para moverte."></canvas>
+
+    <header class="hud" id="hud">
+      <div class="plate">
+        <div class="eyebrow" id="lvNum">Nivel 1 de 7</div>
+        <h1 id="lvName">Primeros pasos</h1>
+        <div class="flourish"><i></i></div>
+      </div>
+      <div class="seal" aria-label="Movidas"><b id="moves">0</b><span id="minTxt">mín. 5</span></div>
+    </header>
+
+    <div class="tip" id="tip">
+      <div class="nt-head"><span>Nota</span><button id="tipClose" aria-label="Ocultar la nota">×</button></div>
+      <p id="tipTxt"></p>
+    </div>
+    <div class="toast" id="toast" hidden></div>
+    <figure class="postal" id="postal" hidden aria-live="polite">
+      <img id="postalImg" alt="">
+      <figcaption class="pc-cap"><strong id="postalPlace"></strong><small id="postalSub"></small></figcaption>
+    </figure>
+
+    <nav class="dock" id="dock" aria-label="Acciones">
+      <button class="db" id="bUndo"><span class="ic"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span><span class="lb">Deshacer</span></button>
+      <button class="db" id="bRestart"><span class="ic"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span><span class="lb">Reiniciar</span></button>
+      <button class="db gold" id="bHint"><span class="ic"><svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg></span><span class="lb">Pista</span></button>
+      <button class="db" id="bMap" aria-pressed="false" hidden><span class="ic"><svg viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14"/><path d="M15 6v14"/></svg></span><span class="lb">Mapa</span></button>
+      <button class="db" id="bLevels"><span class="ic"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/><circle cx="19" cy="18" r="1.5"/></svg></span><span class="lb">Ruta</span></button>
+    </nav>
+
+    <div class="overlay" id="winBox" hidden>
+      <div class="label">
+        <div class="vint">Cosecha 1974</div>
+        <h2 id="winTitle">¡Llegaste!</h2>
+        <div class="grapes" id="winGrapes" aria-label="Calificación"></div>
+        <p id="winTxt"></p>
+        <span class="verdict" id="winChip">Recorrido perfecto</span>
+        <div class="row">
+          <button class="btn-alt" id="winRetry">Repetir</button>
+          <button class="btn-main" id="winNext">Siguiente</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay caught-wrap" id="lostBox" hidden>
+      <div class="caught">
+        <div class="big-seal"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <h2 id="lostTitle">Te vieron</h2>
+        <p id="lostTxt"></p>
+        <div class="row">
+          <button class="btn-alt" id="lostRestart">Empezar de nuevo</button>
+          <button class="btn-main" id="lostUndo">Deshacer</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="chapBox" hidden>
+      <div class="chapter">
+        <div class="eyebrow" id="chapNum">Capítulo 1</div>
+        <h2 id="chapTitle">La bodega</h2>
+        <div class="flourish"><i></i></div>
+        <p id="chapTxt"></p>
+        <button class="btn-main" id="chapGo">Empezar</button>
+      </div>
+    </div>
+
+    <div class="overlay sheet" id="lvSheet" hidden>
+      <div class="route">
+        <div class="eyebrow">Hoja de ruta</div>
+        <h2>Niveles</h2>
+        <div class="tt-head"><span>N°</span><span>Destino</span><span>Mín.</span><span>Tu marca</span></div>
+        <ul class="lvls" id="lvList"></ul>
+        <p class="note">Antes de que juegues, el resolvedor probó todas las jugadas posibles de cada nivel y encontró el camino más corto.</p>
+        <div class="legend">
+          <span><i class="me" style="background:#8fa04f"></i>Vos</span>
+          <span><i style="background:#7a2338"></i>La banda</span>
+          <span><i style="background:#e5574a"></i>Hacia dónde mira</span>
+          <span><i style="background:#ffb3a8"></i>Hacia dónde va a mirar</span>
+          <span><i style="background:#e6b450"></i>Salida</span>
+        </div>
+        <button class="btn-alt install" id="lvInstall" hidden style="width:100%;margin-bottom:10px"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Instalar el juego</button>
+        <div class="row">
+          <button class="btn-alt" id="lvChar">Cambiar personaje</button>
+          <button class="btn-main" id="lvClose">Volver</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="picker" id="picker" hidden>
+    <div class="pk-inner">
+      <div class="eyebrow">Sigilo en la bodega · Mendoza, 1974</div>
+      <h2>¿Con quién vas esta noche?</h2>
+      <div class="flourish"><i></i></div>
+      <p>La banda del Zorro Funes se llevó la corona de la Vendimia. Hay que seguirlos de noche, de punto en punto, sin que te vean.</p>
+      <canvas id="pkCanvas" aria-hidden="true"></canvas>
+      <div class="pk-opts">
+        <button class="pk ticket" data-k="pedro" style="--c:#7d8f45"><span class="tk-stub">PASAJE 01</span><span class="tk-body"><span class="tk-label">Pasajero</span><strong>Pedro</strong><span class="tk-desc">Explorador y baquiano. Conoce cada rincón de la finca.</span></span></button>
+        <button class="pk ticket" data-k="clara" style="--c:#3f88a8"><span class="tk-stub">PASAJE 02</span><span class="tk-body"><span class="tk-label">Pasajera</span><strong>Clara</strong><span class="tk-desc">Su sobrina, cosechadora. Rápida y despierta.</span></span></button>
+      </div>
+      <button class="btn-main install pk-install" id="pkInstall" hidden><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Instalar en el celular</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="iosHelp" hidden style="z-index:12">
+    <div class="ios-help">
+      <div class="eyebrow">Instalar en iPhone o iPad</div>
+      <h2>Llevalo en la pantalla de inicio</h2>
+      <ol>
+        <li>Tocá el botón <b>Compartir</b> <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 12v8h14v-8"/></svg> de Safari.</li>
+        <li>Elegí <b>Agregar a inicio</b>.</li>
+        <li>Abrilo desde el ícono: se juega a pantalla completa y sin internet.</li>
+      </ol>
+      <button class="btn-main" id="iosOk" style="width:100%">Entendido</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/utils/SkeletonUtils.js"></script>
+<script>
+/*__LOGIC__*/
+/*__LEVELS__*/
+</script>
+<script>
+/*__GAME__*/
+</script>
+<script>
+// ---------- Instalar como app (PWA) ----------
+(() => {
+  const btns = [document.getElementById('pkInstall'), document.getElementById('lvInstall')];
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  let deferred = null;
+  const show = on => btns.forEach(b => { if (b) b.hidden = !on; });
+  if (!standalone && ios) show(true);
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; show(true); });
+  addEventListener('appinstalled', () => { deferred = null; show(false); });
+  btns.forEach(b => b && b.addEventListener('click', async () => {
+    if (deferred) { deferred.prompt(); const r = await deferred.userChoice; if (r.outcome === 'accepted') show(false); deferred = null; }
+    else if (ios) document.getElementById('iosHelp').hidden = false;
+  }));
+  document.getElementById('iosOk').onclick = () => { document.getElementById('iosHelp').hidden = true; };
+  if ('serviceWorker' in navigator && location.protocol === 'https:' && !location.hostname.endsWith('claude.ai') && !location.hostname.includes('claudeusercontent'))
+    addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+})();
+</script>

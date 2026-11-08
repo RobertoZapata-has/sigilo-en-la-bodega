@@ -1,0 +1,19 @@
+{
+  "name": "Sigilo en la bodega",
+  "short_name": "Sigilo",
+  "description": "Puzzle de sigilo por turnos. Mendoza, 1974: seguí a la banda del Zorro Funes sin que te vean.",
+  "lang": "es-AR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#12162b",
+  "theme_color": "#12162b",
+  "categories": ["games", "puzzle"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

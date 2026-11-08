@@ -1,0 +1,236 @@
+<title>Prompts de la Vendimia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Libreta de producción: una columna de tarjetas de prompt, agrupadas por personaje y escenario */
+:root {
+  --night: #222a44;
+  --deep: #1a2036;
+  --card: #2a3352;
+  --ink: #f3f0e9;
+  --muted: #b3bad0;
+  --line: rgba(255, 255, 255, 0.12);
+  --gold: #e6b450;
+  --olive: #9aae6a;
+  --petrol: #5fa3c4;
+  --malbec: #d0627a;
+  --display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+body {
+  margin: 0; background: var(--night); color: var(--ink);
+  font-family: var(--body); font-size: 15px; line-height: 1.55;
+}
+.wrap { max-width: 720px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; display: grid; gap: 28px; }
+.eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--muted); }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(26px, 7vw, 38px); line-height: 1.08; margin: 6px 0 10px; text-wrap: balance; }
+h2 { font-family: var(--display); font-weight: 500; font-size: 19px; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); margin: 0; max-width: 62ch; }
+
+.story { background: var(--deep); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: grid; gap: 12px; }
+.story p { margin: 0; max-width: 64ch; }
+.chapters { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.chapters li { border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 13px; }
+.chapters b { display: block; font-family: var(--display); font-weight: 500; font-size: 11px; color: var(--gold); letter-spacing: .06em; }
+.pick { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pick div { border-radius: 10px; padding: 10px 12px; font-size: 13px; background: rgba(255,255,255,.04); border-left: 3px solid var(--c); }
+.pick strong { display: block; color: var(--c); }
+
+.steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; counter-reset: s; }
+.steps li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; counter-increment: s; }
+.steps li::before { content: counter(s); font-family: var(--display); font-size: 13px; color: var(--night); background: var(--gold); width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; margin-top: 1px; }
+
+.progress { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; background: var(--night); padding-block: 10px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.bar { flex: 1; height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--gold); transition: width .3s; }
+
+section { display: grid; gap: 12px; }
+section > header { display: grid; gap: 4px; border-left: 3px solid var(--c, var(--gold)); padding-left: 12px; }
+section > header p { margin: 0; color: var(--muted); font-size: 14px; max-width: 62ch; }
+
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; }
+.card.done { opacity: .6; }
+.top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.top h3 { margin: 0; font-size: 15px; font-weight: 600; }
+.attach { font-size: 12px; color: var(--gold); background: rgba(230,180,80,.12); border-radius: 99px; padding: 2px 10px; }
+.prompt { margin: 0; font-size: 14px; line-height: 1.55; background: var(--deep); border-radius: 10px; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; color: #e5e2da; }
+.actions { display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.copy { background: var(--gold); color: #261c08; border: 0; border-radius: 10px; font: inherit; font-weight: 600; font-size: 14px; padding: 9px 18px; cursor: pointer; min-width: 112px; }
+.copy.ok { background: var(--olive); }
+label.chk { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); cursor: pointer; }
+label.chk input { width: 18px; height: 18px; accent-color: var(--gold); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.note { font-size: 13px; color: var(--muted); margin: 0; }
+@media (max-width: 420px) { .pick { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+</style>
+
+<div class="wrap">
+  <div>
+    <div class="eyebrow">Juego de puzzle · personajes e historia</div>
+    <h1>La corona de la Vendimia</h1>
+    <p class="lede">Prompts para generar en Gemini a Pedro, Clara, la banda de ladrones y los escenarios. Todos usan el mismo estilo de figura coleccionable, así encajan con el juego.</p>
+  </div>
+
+  <div class="story">
+    <div class="eyebrow">Borrador de historia</div>
+    <p>Mendoza, 1974. La noche antes de la Fiesta de la Vendimia, la banda del Zorro Funes roba la corona de la Reina. Pedro, un viejo viñatero, y su sobrina Clara, cosechadora, descubren por dónde la van a sacar de la provincia y la siguen de noche, de punto en punto, sin que los vean.</p>
+    <ul class="chapters">
+      <li><b>CAPÍTULO 1</b>La bodega</li>
+      <li><b>CAPÍTULO 2</b>El andén del Trasandino</li>
+      <li><b>CAPÍTULO 3</b>La playa de camiones</li>
+      <li><b>CAPÍTULO 4</b>El anfiteatro</li>
+    </ul>
+    <p class="note">Al empezar, el jugador elige con quién juega esa noche:</p>
+    <div class="pick">
+      <div style="--c: var(--olive)"><strong>Pedro</strong>Viñatero veterano, firme y paciente. Color verde oliva.</div>
+      <div style="--c: var(--petrol)"><strong>Clara</strong>Cosechadora, rápida y despierta. Color azul petróleo.</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="eyebrow" style="margin-bottom:10px">Cómo usarlos</div>
+    <ol class="steps">
+      <li><span>Empezá por la <b>hoja de estilo</b>. Cuando te guste, guardá esa imagen: es la referencia para todo lo demás.</span></li>
+      <li><span>En cada prompt nuevo, <b>adjuntá lo que dice la etiqueta dorada</b> (la hoja de estilo, la figura de Pedro o la imagen anterior). Así Gemini mantiene la misma cara y el mismo estilo.</span></li>
+      <li><span>Si algo sale mal, no rehagas todo: pedile el cambio puntual en el mismo chat, por ejemplo "igual, pero con la boina más oscura".</span></li>
+    </ol>
+  </div>
+
+  <div class="progress" aria-live="polite"><span id="pTxt">0 de 0 hechos</span><div class="bar"><i id="pBar"></i></div></div>
+
+  <div id="list" style="display:grid; gap:32px"></div>
+</div>
+
+<script>
+const STYLE = 'Estilo: figura coleccionable en miniatura con aspecto de muñeco de resina, como un personaje de película stop-motion. Proporciones un poco cabezonas (cabeza grande, cuerpo compacto), texturas suaves de tela y tejido, base redonda de madera, luz cálida y suave de estudio. Nada de realismo fotográfico ni estilo anime. Sin texto, sin logos ni marcas.';
+const ISO = 'Diorama en miniatura sobre un bloque de piedra gris azulada, visto desde arriba en ángulo isométrico, de noche con luz de luna azulada y algunas luces cálidas. Formas simples, aspecto de maqueta pintada a mano, sin personajes, sin texto, sin logos. Formato horizontal 16:9.';
+
+const PEDRO = 'hombre de unos 60 años, viejo viñatero de Mendoza en los años 70: boina negra, camisa clara arremangada, chaleco tejido verde oliva, pañuelo estampado al cuello, pantalón marrón y alpargatas. Bigote gris, cejas gruesas, postura firme y mirada seria pero bondadosa. Su color identificador es el verde oliva.';
+const CLARA = 'mujer de unos 22 años, sobrina de Pedro, cosechadora en la viña en los años 70: pañuelo azul petróleo atado en la cabeza, pelo oscuro en una trenza larga, camisa clara arremangada, overol de trabajo azul petróleo, alpargatas y un tacho de cosecha de metal colgado al costado. Ágil y despierta, con una sonrisa decidida. Su color identificador es el azul petróleo.';
+
+const SECTIONS = [
+  { title: 'Dirección de arte', c: 'var(--gold)', text: 'La primera imagen fija el estilo de todo el juego.', items: [
+    { id: 'estilo', name: 'Hoja de estilo', attach: 'Nada', p:
+`Creá una hoja de estilo para un videojuego de puzzle por turnos. Mostrá cuatro figuras de juego de mesa paradas una al lado de la otra, cada una sobre una base redonda:
+1) un obrero de viña de los años 70 con boina y chaleco verde oliva;
+2) una joven cosechadora de los años 70 con pañuelo y overol azul petróleo;
+3) un ladrón con poncho oscuro bordó, quieto y vigilando;
+4) un sereno con farol de kerosene y saco bordó.
+${STYLE} Fondo liso gris azulado. Formato horizontal 16:9.` },
+  ]},
+  { title: 'Pedro', c: 'var(--olive)', text: 'Ya lo tenés hecho. Los prompts quedan acá por si querés rehacer alguna imagen.', items: [
+    { id: 'b1', name: 'Personaje a partir de la foto', attach: 'Foto de referencia + hoja de estilo', p:
+`Tomá la cara de la persona de la primera foto como referencia (rasgos, forma de la cara, peinado y bigote si tiene) y convertila en un personaje con el estilo de la segunda imagen.
+El personaje es Pedro, ${PEDRO}
+Cuerpo entero, de frente, sobre una base redonda. ${STYLE} Fondo liso gris azulado.` },
+    { id: 'b2', name: 'Vista de frente, perfil y espalda', attach: 'La figura de Pedro', p:
+`Usando exactamente el mismo personaje de la imagen adjunta, hacé una hoja de giro con cuatro vistas en fila: de frente, tres cuartos, de perfil y de espaldas. Misma ropa, mismos colores, misma escala, postura neutra con los brazos un poco separados del cuerpo. ${STYLE} Fondo liso claro. Formato horizontal 16:9.` },
+    { id: 'b3', name: 'Retratos para los diálogos', attach: 'La figura de Pedro', p:
+`Con el mismo personaje de la imagen adjunta, hacé tres retratos de busto en fila, con distintas expresiones: sereno, con una sonrisa pícara, y sorprendido con las cejas levantadas. Mismo estilo, misma ropa y mismos colores. Fondo liso verde oliva oscuro. Formato horizontal 16:9.` },
+    { id: 'b4', name: 'Figura sobre el tablero', attach: 'La figura de Pedro', p:
+`Mostrá al mismo personaje de la imagen adjunta como pieza de juego: una figura chica parada dentro de un aro verde oliva, sobre un camino de adoquines claros en un tablero de maqueta, vista desde arriba en ángulo isométrico, de noche, con un farol a lo lejos y su sombra en el piso. ${STYLE}` },
+  ]},
+  { title: 'Clara', c: 'var(--petrol)', text: 'El segundo personaje. No sale de una foto: se arma a partir de la figura de Pedro para que tenga el mismo acabado y la misma escala.', items: [
+    { id: 'l1', name: 'Personaje nuevo', attach: 'La figura de Pedro de cuerpo entero', p:
+`Creá un personaje nuevo con exactamente el mismo estilo, acabado, proporciones y tipo de base de madera que la figura adjunta. Es Clara, ${CLARA}
+Cuerpo entero, de frente, postura neutra, sobre su base redonda de madera. ${STYLE} Fondo liso gris azulado. Formato vertical 9:16.` },
+    { id: 'l2', name: 'Vista de frente, perfil y espalda', attach: 'La figura de Clara', p:
+`Usando exactamente el mismo personaje de la imagen adjunta, hacé una hoja de giro con cuatro vistas en fila: de frente, tres cuartos, de perfil y de espaldas. Misma ropa, mismos colores, misma escala, postura neutra con los brazos un poco separados del cuerpo. ${STYLE} Fondo liso claro. Formato horizontal 16:9.` },
+    { id: 'l3', name: 'Retratos para los diálogos', attach: 'La figura de Clara', p:
+`Con el mismo personaje de la imagen adjunta, hacé tres retratos de busto en fila, con distintas expresiones: decidida con media sonrisa, susurrando con un dedo sobre los labios, y sorprendida con los ojos bien abiertos. Mismo estilo, misma ropa y mismos colores. Fondo liso azul petróleo oscuro. Formato horizontal 16:9.` },
+    { id: 'l4', name: 'Figura sobre el tablero', attach: 'La figura de Clara + la de Pedro en el tablero', p:
+`Mostrá al personaje de la primera imagen en la misma situación que la segunda imagen: una figura chica parada dentro de un aro, esta vez azul petróleo, sobre un camino de adoquines claros en un tablero de maqueta, vista desde arriba en ángulo isométrico, de noche, con un farol a lo lejos y su sombra en el piso. Mismo encuadre y misma luz que la segunda imagen. ${STYLE}` },
+    { id: 'l5', name: 'Pedro y Clara juntos', attach: 'Las figuras de Pedro y de Clara', p:
+`Poné a los dos personajes de las imágenes adjuntas uno al lado del otro, cada uno sobre su base de madera, a la misma escala: Pedro con una mano apoyada en el hombro de Clara, ella señalando hacia adelante. Sirve para comparar alturas y colores. ${STYLE} Fondo liso gris azulado. Formato horizontal 16:9.` },
+  ]},
+  { title: 'Para animar en 3D', c: 'var(--gold)', text: 'Imágenes pensadas para Mixamo o Meshy: sin base de madera, de frente, con brazos y piernas separados del cuerpo. Así el programa encuentra bien las articulaciones.', items: [
+    { id: 'a1', name: 'Pedro sin base, en pose A', attach: 'La figura de Pedro', p:
+`Usando exactamente el mismo personaje de la imagen adjunta (misma cara, ropa, colores y proporciones), mostralo de cuerpo entero y de frente, parado directamente sobre el piso, SIN base de madera ni pedestal. Pose neutra en forma de A: brazos estirados hacia los costados y hacia abajo, separados del cuerpo unos 45 grados, manos abiertas con los dedos juntos, piernas un poco abiertas para que se vea espacio entre ellas. Sin objetos en las manos, nada que tape brazos o piernas. Vista frontal recta, sin perspectiva, cámara a la altura del pecho. Luz pareja y suave, sin sombras fuertes. Fondo liso blanco. Formato vertical 9:16.` },
+    { id: 'a2', name: 'Clara sin base, en pose A', attach: 'La figura de Clara', p:
+`Usando exactamente el mismo personaje de la imagen adjunta (misma cara, ropa, colores y proporciones), mostrala de cuerpo entero y de frente, parada directamente sobre el piso, SIN base de madera ni pedestal y SIN el tacho de cosecha. Pose neutra en forma de A: brazos estirados hacia los costados y hacia abajo, separados del cuerpo unos 45 grados, manos abiertas con los dedos juntos, piernas un poco abiertas para que se vea espacio entre ellas. La trenza cae por la espalda, sin tapar los brazos. Vista frontal recta, sin perspectiva, cámara a la altura del pecho. Luz pareja y suave, sin sombras fuertes. Fondo liso blanco. Formato vertical 9:16.` },
+    { id: 'a3', name: 'Vista de espalda en la misma pose', attach: 'La imagen anterior (Pedro o Clara en pose A)', p:
+`Mostrá exactamente el mismo personaje de la imagen adjunta, en la misma pose A y con el mismo encuadre, pero visto de espaldas. Sin base ni pedestal, fondo liso blanco, luz pareja. Formato vertical 9:16.` },
+  ]},
+  { title: 'Elegir personaje', c: 'var(--gold)', text: 'La pantalla del comienzo, donde el jugador decide con quién juega.', items: [
+    { id: 'sel', name: 'Pantalla de elección', attach: 'Las figuras de Pedro y Clara', p:
+`Con los dos personajes de las imágenes adjuntas, armá la ilustración de una pantalla de elección de personaje: Pedro a la izquierda bajo una luz verde oliva y Clara a la derecha bajo una luz azul petróleo, los dos de cuerpo entero sobre sus bases, mirando hacia el frente. Detrás, de noche, una viña en primer plano y la cordillera nevada de Mendoza con la luna. Dejá espacio libre arriba para un título. ${STYLE} Formato vertical 9:16.` },
+    { id: 'tapa', name: 'Portada del juego', attach: 'Las figuras de Pedro y Clara', p:
+`Ilustración de portada para un juego de puzzle de sigilo: los dos personajes de las imágenes adjuntas, agachados detrás de unas barricas de vino, espiando a un ladrón con poncho bordó que se lleva una corona dorada hecha de racimos de uva y hojas de parra. Noche de luna sobre Mendoza, con la cordillera de fondo. Tono de aventura familiar, nada violento. ${STYLE} Formato vertical 9:16, con espacio libre arriba para el título.` },
+  ]},
+  { title: 'La banda del Zorro Funes', c: 'var(--malbec)', text: 'Los guardias del tablero. Cada tipo se distingue a simple vista: el vigía se queda quieto, el sereno camina con su farol.', items: [
+    { id: 'z1', name: 'El Zorro Funes, el jefe', attach: 'Hoja de estilo', p:
+`Con el estilo de la imagen adjunta, creá al villano de la historia: el Zorro Funes, un ladrón elegante de los años 70, flaco y alto, con saco cruzado bordó, sombrero, bigote finito, bastón con empuñadura dorada y sonrisa astuta. Pícaro más que malvado, apto para un juego familiar. Cuerpo entero sobre una base redonda bordó. ${STYLE} Fondo liso gris azulado.` },
+    { id: 'z2', name: 'El vigía', attach: 'Hoja de estilo', p:
+`Con el estilo de la imagen adjunta, creá un ladrón vigía para un juego de sigilo: hombre robusto con poncho oscuro bordó y gorro de lana, parado firme, mirando fijo hacia adelante con los brazos cruzados. Sobre una base redonda bordó. Mostralo de frente y de perfil, uno al lado del otro. ${STYLE} Fondo liso gris azulado. Formato horizontal 16:9.` },
+    { id: 'z3', name: 'El sereno con farol', attach: 'Hoja de estilo', p:
+`Con el estilo de la imagen adjunta, creá un sereno sobornado que hace la ronda para la banda: hombre flaco con saco bordó gastado, gorra y un farol de kerosene encendido en la mano, caminando. Sobre una base redonda bordó. Mostralo de frente y de perfil, uno al lado del otro. ${STYLE} Fondo liso gris azulado. Formato horizontal 16:9.` },
+    { id: 'corona', name: 'La corona de la Vendimia', attach: 'Hoja de estilo', p:
+`Con el estilo de la imagen adjunta, dibujá una corona de reina hecha de metal dorado con forma de racimos de uva y hojas de parra, con piedras moradas, apoyada sobre un almohadón de terciopelo bordó. Objeto solo, centrado, con un brillo suave. ${STYLE} Fondo liso gris azulado. Formato cuadrado.` },
+  ]},
+  { title: 'Escenarios', c: 'var(--gold)', text: 'Uno por capítulo. Sirven de guía para armar los tableros en 3D y como fondo de las pantallas de historia.', items: [
+    { id: 'e1', name: 'Capítulo 1 · La bodega', attach: 'Hoja de estilo', p:
+`Con el estilo de la imagen adjunta: ${ISO} Una bodega mendocina antigua: galpón de adobe con techo de chapa, hileras de barricas de roble, piletas de cemento, una pasarela de madera y, alrededor, hileras de viñedo con postes y alambres. Caminos de piedra clara que conectan distintos puntos, como un tablero de juego.` },
+    { id: 'e2', name: 'Capítulo 2 · El andén del Trasandino', attach: 'Hoja de estilo', p:
+`Con el estilo de la imagen adjunta: ${ISO} Una estación de tren de montaña de los años 70: andén de madera, una pequeña locomotora antigua con dos vagones de pasajeros, faroles encendidos, cajones de carga y, de fondo, la cordillera nevada. Caminos de piedra clara que conectan distintos puntos, como un tablero de juego.` },
+    { id: 'e3', name: 'Capítulo 3 · La playa de camiones', attach: 'Hoja de estilo', p:
+`Con el estilo de la imagen adjunta: ${ISO} Una playa de camiones de una petrolera en los años 70, sin logos: camiones cisterna estacionados, tanques de combustible redondos, barriles, una garita de control con una luz y un portón de alambre. Caminos de piedra clara que conectan distintos puntos, como un tablero de juego.` },
+    { id: 'e4', name: 'Capítulo 4 · El anfiteatro', attach: 'Hoja de estilo', p:
+`Con el estilo de la imagen adjunta: ${ISO} Un anfiteatro al aire libre entre los cerros, preparado para la Fiesta de la Vendimia: gradas de piedra, un gran escenario con decorado de racimos y hojas de parra, guirnaldas de luces y reflectores apagados. Caminos de piedra clara que conectan distintos puntos, como un tablero de juego.` },
+  ]},
+];
+
+let done = {};
+try { done = JSON.parse(localStorage.getItem('vendimia-prompts') || '{}') || {}; } catch (e) { done = {}; }
+const save = () => { try { localStorage.setItem('vendimia-prompts', JSON.stringify(done)); } catch (e) {} };
+const total = SECTIONS.reduce((n, s) => n + s.items.length, 0);
+
+function progress() {
+  const n = Object.values(done).filter(Boolean).length;
+  document.getElementById('pTxt').textContent = `${n} de ${total} hechos`;
+  document.getElementById('pBar').style.width = (n / total * 100) + '%';
+}
+
+const list = document.getElementById('list');
+for (const s of SECTIONS) {
+  const sec = document.createElement('section');
+  sec.style.setProperty('--c', s.c);
+  sec.innerHTML = `<header><h2></h2><p></p></header>`;
+  sec.querySelector('h2').textContent = s.title;
+  sec.querySelector('p').textContent = s.text;
+  for (const it of s.items) {
+    const card = document.createElement('article');
+    card.className = 'card' + (done[it.id] ? ' done' : '');
+    card.innerHTML = `
+      <div class="top"><h3></h3><span class="attach"></span></div>
+      <p class="prompt"></p>
+      <div class="actions">
+        <button class="copy" type="button">Copiar</button>
+        <label class="chk"><input type="checkbox" id="chk-${it.id}"> Ya lo generé</label>
+      </div>`;
+    card.querySelector('h3').textContent = it.name;
+    card.querySelector('.attach').textContent = 'Adjuntá: ' + it.attach;
+    const pre = card.querySelector('.prompt');
+    pre.textContent = it.p;
+    const btn = card.querySelector('.copy');
+    btn.addEventListener('click', () => {
+      const ok = () => { btn.textContent = 'Copiado'; btn.classList.add('ok'); setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('ok'); }, 1600); };
+      const fallback = () => {
+        const r = document.createRange(); r.selectNodeContents(pre);
+        const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+        try { if (document.execCommand('copy')) { ok(); return; } } catch (e) {}
+        btn.textContent = 'Seleccionado: copialo';
+      };
+      try { navigator.clipboard.writeText(it.p).then(ok, fallback); } catch (e) { fallback(); }
+    });
+    const chk = card.querySelector('input');
+    chk.checked = !!done[it.id];
+    chk.addEventListener('change', () => { done[it.id] = chk.checked; card.classList.toggle('done', chk.checked); save(); progress(); });
+    sec.appendChild(card);
+  }
+  list.appendChild(sec);
+}
+progress();
+</script>
