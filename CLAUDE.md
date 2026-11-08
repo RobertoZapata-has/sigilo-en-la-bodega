@@ -16,7 +16,7 @@ La banda (todos en bordó):
 - **Sereno**: saco bordó largo, gorra y farol de kerosene encendido; hace una ronda fija.
 - **Zorro Funes**: el jefe (todavía no está en el juego).
 
-Capítulos: 1 La finca (hecho), 2 El Trasandino (hecho), 3 La playa de camiones, 4 La Vía Blanca, 5 El Teatro Griego.
+Capítulos: 1 La finca (hecho), 2 El Trasandino (hecho), 3 La playa de camiones (hecho), 4 La Vía Blanca, 5 El Teatro Griego.
 
 ## Reglas del juego (src/logic.js)
 
@@ -117,6 +117,20 @@ Se hizo en paralelo a lo de arriba y se fusionó a mano el 1/11 (fusión de tres
 - **Ilustraciones de Canva** (`assets/lugares/`, `docs/lugares/`): finca, viña, patio, bodega, estación, andén, vías, vagón, Uspallata, puente. Están en el diseño de Canva "Álbum ilustrado de Mendoza 1974" (páginas 9 a 18). Cada nivel tiene `art` y `place`: se ven en la postal al empezar (`#postal`), de fondo en el cartel de capítulo y en la hoja de ruta.
 - Cielos nuevos `luna` y `alba`. Los guardas que giran usan el modelo del vigía.
 - **PWA:** `manifest.json`, `sw.js` (red primero para la página, caché para lo demás), íconos en `docs/icons/` (sello de lacre con corona), botón "Instalar" en la elección de personaje y en la hoja de ruta (en iPhone muestra los pasos).
+
+## Capítulo 3: La playa de camiones (8/11/2026)
+
+- Niveles 13 a 18 (`theme: 'playa'`, escenas `bascula`, `cajones`, `perros`, `piedra`, `faros`, `galpon` en `TREN.build` → `buildPlaya`). Cielos: `dia` (nuevo), `tarde`, `anochecer`, `noche`. El 18 tiene `outro` y `outroTitle` (la nota del Zorro: la corona va en un carro de la Vía Blanca).
+- **Reglas nuevas** en logic.js (todas entran en `keyOf` y en el resolvedor):
+  - Capataz con farol: patrulla con `range: 2` (ve su próximo paso y el siguiente en línea recta).
+  - `crates: [[x,y]]`: cajones que se empujan caminando hacia ellos (no pasan a la salida, a una barrica, a otro cajón, a una piedra ni a un guardia). Tapan la vista y los faros, y frenan a patrullas y perros.
+  - Perros `{t:'dog', at, leash, smell}`: si estás a `smell` pasos o menos te siguen un paso por turno, sin alejarse más de `leash` de la cucha; si no, vuelven. No se los puede sacar del medio: entrar a su punto o que te alcancen = perdés.
+  - `stones: [[x,y]]` (y `carry: n`): piedras para juntar. Acción `'T:x,y'` (tirar hasta `throwRange`, 3 por defecto, en línea recta): los vigías a 2 casilleros o menos del ruido se dan vuelta a mirarlo (los que giran no) y los perros a 3 o menos corren hacia la piedra. `actions(lv, s)` da todas las acciones posibles.
+  - `lights: [{from, dir, len, every, on, phase}]`: faros que iluminan una fila; con `every` parpadean. Quedar en la luz = perdés. Un cajón o una barrica cortan el haz.
+- Interfaz: botón **Piedra** en la botonera (tecla P) con contador; en modo tirar se marcan en dorado los puntos posibles. Carteles "APAGA/PRENDE" sobre los faros que parpadean. Los puntos rosados alrededor del perro son hasta dónde huele; los aros, hasta dónde llega la cadena.
+- Kit de Blender `assets/modelos/playa/` (+ `playa_kit.blend`) empaquetado en `docs/playa_model.js` como `window.KIT_PLAYA`: camión (la pintura `sk_camion_pintura` se recolorea en el juego), cajón (el que se empuja), pila de cajones, báscula, galpón de la cooperativa, poste de luz, tambores, cucha, alambrado, tranquera, surtidor y el perro con patas, cabeza y cola sueltas (`CHARS.build('perro')` lo anima por código).
+- Ilustraciones: báscula y cajones son de Canva (álbum, páginas 19 y 20). Se terminaron los créditos de Canva: perros, piedra, faros y galpón por ahora son capturas del propio juego con filtro de pintura; reemplazarlas cuando haya créditos.
+- `tools/casos/c13..c18.js` y `tools/play.js`-style: `search2.js` ahora conoce perros, cajones, piedras y faros.
 
 ## Ideas pendientes
 

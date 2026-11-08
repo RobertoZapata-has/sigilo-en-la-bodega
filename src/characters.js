@@ -195,7 +195,71 @@ const CHARS = (() => {
     ch.mixer.update(dt);
   }
 
+  // ---------- El perro de la banda ----------
+  // Usa la pieza "perro" del kit de la playa (hecha en Blender con patas, cabeza y cola sueltas);
+  // mientras no carga, un perro de formas simples. Mira hacia +Z como los demás.
+  function buildDog() {
+    const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
+    const parts = { legs: [], head: null, tail: null };
+    const kit = (typeof TREN !== 'undefined' && TREN.kitClone) ? TREN.kitClone('perro') : null;
+    let inner;
+    if (kit) {
+      inner = kit;
+      inner.traverse(o => {
+        if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; }
+        const n = o.name || '';
+        if (n.startsWith('perro_pata')) parts.legs.push(o);
+        else if (n.startsWith('perro_cabeza') && !parts.head) parts.head = o;
+        else if (n.startsWith('perro_cola') && !parts.tail) parts.tail = o;
+      });
+      parts.legs = parts.legs.filter(o => !o.isMesh || !o.parent || !(o.parent.name || '').startsWith('perro_pata'));
+    } else {
+      inner = new THREE.Group();
+      const fur = mat(0xa8783e), dark = mat(0x5a3c22), light = mat(0xd8bf94);
+      const b = new THREE.Mesh(new THREE.SphereGeometry(0.2, 14, 10), fur); b.scale.set(1.9, 0.9, 0.85); b.position.y = 0.42; inner.add(b);
+      const hp = new THREE.Group(); hp.position.set(0.33, 0.52, 0); inner.add(hp);
+      const h = new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 10), fur); h.position.set(0.1, 0.08, 0); hp.add(h);
+      const sn = new THREE.Mesh(new THREE.SphereGeometry(0.07, 10, 8), light); sn.scale.set(1.3, 0.8, 0.7); sn.position.set(0.23, 0.04, 0); hp.add(sn);
+      [-0.06, 0.06].forEach(z => { const e = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.12, 4), dark); e.position.set(0.05, 0.22, z); hp.add(e); });
+      parts.head = hp;
+      const tp = new THREE.Group(); tp.position.set(-0.33, 0.5, 0); inner.add(tp);
+      const t = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.012, 0.3, 8), fur); t.position.set(-0.1, 0.11, 0); t.rotation.z = 0.7; tp.add(t);
+      parts.tail = tp;
+      [[0.25, -0.1], [0.25, 0.1], [-0.27, -0.1], [-0.27, 0.1]].forEach(([x, z]) => {
+        const lp = new THREE.Group(); lp.position.set(x, 0.42, z); inner.add(lp);
+        const l = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.035, 0.42, 8), fur); l.position.y = -0.21; lp.add(l);
+        parts.legs.push(lp);
+      });
+      inner.traverse(o => { if (o.isMesh) o.castShadow = true; });
+    }
+    inner.rotation.y = -Math.PI / 2;      // la trompa del perro (+X en Blender) mira a +Z
+    inner.scale.setScalar(0.98);
+    body.add(inner);
+    parts.legs.forEach(l => { l.userData.r0 = l.rotation.clone(); });
+    if (parts.head) parts.head.userData.r0 = parts.head.rotation.clone();
+    if (parts.tail) parts.tail.userData.r0 = parts.tail.rotation.clone();
+    const ch = { kind: 'perro', name: 'Perro', color: 0x7a1f36, root, mode: 'idle', phase: 0, stepRate: 16, seed: Math.random() * 10, dog: parts, body };
+    root.userData.ch = ch;
+    ALL.push(ch);
+    return root;
+  }
+  function animateDog(ch, dt, t) {
+    const P = ch.dog, walk = ch.mode === 'walk', bite = ch.mode === 'push' || ch.mode === 'surprised';
+    if (walk) ch.phase += dt * ch.stepRate;
+    P.legs.forEach((l, i) => {
+      const r0 = l.userData.r0, sw = walk ? Math.sin(ch.phase + (i === 0 || i === 3 ? 0 : Math.PI)) * 0.55 : 0;
+      // en el espacio del perro las patas giran alrededor de su eje Z (de costado)
+      l.rotation.z = r0.z + sw;
+    });
+    if (P.tail) P.tail.rotation.y = P.tail.userData.r0.y + Math.sin(t * (walk ? 14 : 9) + ch.seed) * (bite ? 0.1 : 0.55);
+    if (P.head) P.head.rotation.z = P.head.userData.r0.z + (ch.mode === 'bark' ? Math.abs(Math.sin(t * 16)) * 0.35 : bite ? 0.25 : Math.sin(t * 1.6 + ch.seed) * 0.06);
+    const y = walk ? Math.abs(Math.sin(ch.phase)) * 0.03 : 0;
+    ch.body.position.y += (y - ch.body.position.y) * Math.min(1, dt * 14);
+    ch.body.position.z += ((bite ? 0.25 : 0) - ch.body.position.z) * Math.min(1, dt * 12);
+  }
+
   function build(kind) {
+    if (kind === 'perro') return buildDog();
     if (MODELS[kind]) return buildModel(kind);
     const P = PAL[kind];
     const root = new THREE.Group();
@@ -385,10 +449,10 @@ const CHARS = (() => {
       const ch = ALL[i];
       if (ch.dead) { ALL.splice(i, 1); continue; }
       if (!ch.root.parent) continue;
-      if (ch.model) animateModel(ch, dt, t); else animate(ch, dt, t);
+      if (ch.dog) animateDog(ch, dt, t); else if (ch.model) animateModel(ch, dt, t); else animate(ch, dt, t);
     }
   }
   function release(root) { if (root && root.userData.ch) root.userData.ch.dead = true; }
 
-  return { build, tick, release, PAL, loadModel, has: k => !!MODELS[k], set onModel(f) { onModel = f; } };
+  return { build, tick, release, PAL, loadModel, has: k => !!MODELS[k], set onModel(f) { onModel = f; }, notify: k => onModel && onModel(k) };
 })();

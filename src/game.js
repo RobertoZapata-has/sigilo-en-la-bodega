@@ -74,7 +74,7 @@ tri.moveTo(0, 0.2); tri.lineTo(-0.17, -0.12); tri.lineTo(0.17, -0.12); tri.lineT
 G.arrow = new THREE.ShapeGeometry(tri);
 
 // ---------- Estado de la partida ----------
-let decorTick = null, TDEC = null;
+let decorTick = null, TDEC = null, crateMeshes = new Map(), itemMeshes = new Map(), throwMode = false;
 let LVD = {}, idx = 0, LV, state, hist = [], busy = false, hintKey = null;
 let charKind = null;
 try { charKind = localStorage.getItem('sigilo-char'); } catch (e) {}
@@ -116,7 +116,7 @@ function buildLevel(i, opts = {}) {
   center = [(gx0 + gx1) / 2 * SP, (gy0 + gy1) / 2 * SP];
   const w = (gx1 - gx0) * SP, d = (gy1 - gy0) * SP;
   const themed = !!LVD.theme;
-  ext = { x0: -w / 2, x1: w / 2, z0: -d / 2, z1: d / 2, yTop: LVD.theme === 'anden' || LVD.theme === 'tren' ? 2.9 : themed ? 2.3 : 1.2, yBot: themed ? -1.6 : -0.7 };
+  ext = { x0: -w / 2, x1: w / 2, z0: -d / 2, z1: d / 2, yTop: LVD.theme === 'anden' || LVD.theme === 'tren' || LVD.theme === 'playa' ? 2.9 : themed ? 2.3 : 1.2, yBot: themed ? -1.6 : -0.7 };
 
   // Maqueta
   if (themed) {
@@ -135,9 +135,11 @@ function buildLevel(i, opts = {}) {
     noche: { hemi: [0xdde4ff, 0x3b3044, 0.62], sun: [0xc9d4ff, 0.55] },
     luna: { hemi: [0xc4d2ff, 0x2c2a3e, 0.66], sun: [0xc8d8ff, 0.7] },
     alba: { hemi: [0xffd9d2, 0x4a3a52, 0.8], sun: [0xffa58a, 0.95] },
+    dia: { hemi: [0xf4ecdc, 0x5a4c3c, 0.74], sun: [0xfff0d4, 1.0] },
   };
   const sky = LVD.sky || (themed ? 'noche' : 'dia');
   $('#stage').dataset.sky = sky;
+  M.stone.color.set(sky === 'dia' ? 0x9c9282 : sky === 'tarde' ? 0xb1a795 : 0xbdb5a5);   // de día los caminos encandilan
   const L = SKY[sky];
   if (L) { hemi.color.set(L.hemi[0]); hemi.groundColor.set(L.hemi[1]); hemi.intensity = L.hemi[2]; sun.color.set(L.sun[0]); sun.intensity = L.sun[1]; }
   else { hemi.color.set(0xdde4ff); hemi.groundColor.set(0x3b3044); hemi.intensity = 0.8; sun.color.set(0xfff0d8); sun.intensity = 0.85; }
@@ -181,13 +183,18 @@ function buildLevel(i, opts = {}) {
   if (LVD.theme === 'bodega') DECOR.bodega(board, toW, SP);
   if (LVD.theme === 'finca') DECOR.finca(board, toW, SP, LV, [gx0, gy0, gx1, gy1], LVD.extra);
   if (LVD.theme === 'anden') decorTick = DECOR.anden(board, toW, SP).update;
-  if (LVD.theme === 'tren') { TDEC = TREN.build(LVD.scene, board, toW, SP, LV, LVD, [gx0, gy0, gx1, gy1]); decorTick = TDEC.update; }
+  if (LVD.theme === 'tren' || LVD.theme === 'playa') { TDEC = TREN.build(LVD.scene, board, toW, SP, LV, LVD, [gx0, gy0, gx1, gy1]); decorTick = TDEC.update; }
+  // cajones que se empujan y piedras para juntar
+  crateMeshes = new Map(); itemMeshes = new Map(); throwMode = false;
+  for (const k of state.crates) { const c = TREN.crateMesh(); c.position.copy(wp(k)); c.rotation.y = (P(k)[0] * 7 + P(k)[1] * 3) % 4 * 0.06; board.add(c); crateMeshes.set(k, c); }
+  for (const k of state.items) { const st = TREN.stonePile(); st.position.copy(wp(k)); board.add(st); itemMeshes.set(k, st); }
+  updateStoneBtn();
   player = CHARS.build(charKind || 'pedro');
   player.scale.setScalar(FIG);
   player.userData.face = 0;
   board.add(player);
   $('.legend .me').style.background = '#' + new THREE.Color(chOf(player).color).getHexString();
-  const kindOf = e => e.t !== 'sentry' ? 'sereno' : e.turn ? (CHARS.has('vigia') ? 'vigia' : 'guarda') : (e.range || 1) === 1 ? 'vigia' : 'sereno';
+  const kindOf = e => e.t === 'dog' ? 'perro' : e.t !== 'sentry' ? 'sereno' : e.turn ? (CHARS.has('vigia') ? 'vigia' : 'guarda') : (e.range || 1) === 1 ? 'vigia' : 'sereno';
   enemyMeshes = state.en.map(e => { const m = CHARS.build(kindOf(e)); m.scale.setScalar(FIG); board.add(m); return m; });
   // barricas en los puntos que sirven de escondite
   for (const k of LV.cover) DECOR.coverSpot(board, wp(k), LVD.theme === 'tren' ? 'tren' : null);
@@ -243,8 +250,17 @@ function snap() {
       placeTied(m, i);
     }
   });
+  // cajones y piedras donde dice el estado (al deshacer o reiniciar)
+  if (crateMeshes.size) {
+    const ms = [...crateMeshes.values()]; crateMeshes = new Map();
+    state.crates.forEach((k, i) => { ms[i].position.copy(wp(k)); crateMeshes.set(k, ms[i]); });
+  }
+  itemMeshes.forEach((m, k) => { m.visible = state.items.includes(k); m.scale.setScalar(1); m.position.copy(wp(k)); });
+  if (TDEC && TDEC.setLights) TDEC.setLights(state.moves, state.crates);
+  throwMode = false; updateStoneBtn();
   if (state.over === 'caught') {
-    const a = state.by === 'train' ? wp(state.p).add(new THREE.Vector3(-(LV.trains[state.train].dir || 1), 0, 0)) : wp(state.en[state.by].pos), b = wp(state.p);
+    const a = state.by === 'train' ? wp(state.p).add(new THREE.Vector3(-(LV.trains[state.train].dir || 1), 0, 0))
+      : state.by === 'light' ? wp(LV.lights[state.light].beam[0]) : wp(state.en[state.by].pos), b = wp(state.p);
     chOf(player).mode = 'surprised';
     tipQuat(player, b.clone().sub(a).normalize(), 1, player.quaternion.clone());
   }
@@ -325,7 +341,7 @@ function badge(text, bg, fg, kind) {
     x.fillStyle = fg; x.textAlign = 'center'; x.textBaseline = 'middle';
     x.font = (text.length > 1 && text !== '↔' ? '600 50px' : '700 62px') + ' "Barlow Condensed", Arial, sans-serif';
     x.fillText(text, 64, 68);
-    if (kind === 'tren') { x.font = '600 18px "Barlow Condensed", Arial'; x.fillText('TREN', 64, 104); }
+    if (kind === 'tren' || kind === 'apaga' || kind === 'prende') { x.font = '600 18px "Barlow Condensed", Arial'; x.fillText(kind.toUpperCase(), 64, 104); }
     const t = new THREE.CanvasTexture(cv);
     BADGES[key] = new THREE.SpriteMaterial({ map: t, depthTest: false, transparent: true });
   }
@@ -340,6 +356,13 @@ function drawMarkers() {
   for (const e of state.en) {
     if (!e.alive) continue;
     if (e.t === 'patrol') for (const k of e.route) if (k !== e.pos) flat(G.dot, M.route, wp(k), 0.08);
+    if (e.t === 'dog') {
+      // hasta dónde huele el perro y hasta dónde llega su cadena
+      const dS = distances(LV, e.pos, state, e.smell + 1), dH = distances(LV, e.home, state, e.leash + 1);
+      for (const [k, d] of dS) if (d > 0 && d <= e.smell) flat(G.dot, M.dangerNext, wp(k), 0.09).scale.setScalar(1.35);
+      for (const [k, d] of dH) if (d === e.leash) flat(G.ring, M.route, wp(k), 0.085).scale.setScalar(0.55);
+      continue;
+    }
     const f = facing(LV, e), a = wp(e.pos);
     const nf = nextFacing(LV, e);
     if (nf && nf !== f) {
@@ -353,7 +376,7 @@ function drawMarkers() {
       markers.add(g2);
     }
     if (!f) continue;
-    const seen = sight(LV, e, state.moves);
+    const seen = sight(LV, e, state.moves, state);
     const b = wp(f);
     seen.forEach((k, i) => { const r = flat(G.dangerRing, M.danger, wp(k), 0.1); if (i) r.scale.setScalar(0.8); });
     if (!seen.length) flat(G.dot, M.danger, b, 0.1);   // la vista está tapada por una barrica
@@ -372,6 +395,19 @@ function drawMarkers() {
     const sp = badge(String(n), warn ? '#e5574a' : '#efe3c8', warn ? '#fff' : '#2b2117', 'tren'); sp.position.copy(p); markers.add(sp);
     if (warn) for (const k of tr.nodes) flat(G.dangerRing, M.danger, wp(k), 0.1).scale.setScalar(0.7);
   });
+  // faros: los que parpadean muestran en cuántos turnos cambian
+  (LV.lights || []).forEach(l => {
+    const lit = litNodes(LV, l, state.moves, state);
+    for (const k of lit) flat(G.dangerRing, M.danger, wp(k), 0.1).scale.setScalar(0.7);
+    if (!l.every) return;
+    const on = lightOn(l, state.moves); let n = 1; while (n < l.every && lightOn(l, state.moves + n) === on) n++;
+    const [x, y] = P(l.beam[0]), p = wp(l.beam[0]);
+    const sp = badge(String(n), on ? '#e5574a' : '#efe3c8', on ? '#fff' : '#2b2117', on ? 'apaga' : 'prende'); sp.position.set(p.x, 1.25, p.z); markers.add(sp);
+  });
+  // tirar una piedra: los puntos a los que llega
+  if (throwMode && !state.over && !busy) for (const k of throwTargets(LV, state)) {
+    const r = flat(G.ring, M.hint, wp(k), 0.12); r.scale.setScalar(0.85);
+  }
   // puertas: abiertas (verde) o cuántos turnos faltan para que se abran
   (LV.doors || []).forEach(d => {
     const a = wp(d.a), b = wp(d.b), open = doorOpen(d, state.moves);
@@ -458,17 +494,50 @@ async function caughtAnim(m, ePos, pPos) {
 
 async function playTurn(prev, r) {
   const ev = r.ev;
-  const pm = ev.find(e => e.k === 'pmove');
-  const from = wp(pm.from), to = wp(pm.to);
-  const dir = to.clone().sub(from).normalize();
   const pc = chOf(player);
-  if (pm.blocked) {
+  const th = ev.find(e => e.k === 'throw');
+  const pm = ev.find(e => e.k === 'pmove') || { from: prev.p, to: prev.p };
+  const from = wp(pm.from), to = wp(pm.to);
+  const dir = th ? new THREE.Vector3(0, 0, 1) : to.clone().sub(from).normalize();
+  const push = ev.find(e => e.k === 'push'), pick = ev.find(e => e.k === 'pick');
+  if (th) {
+    // la piedra vuela en arco y hace ruido donde cae
+    const a = wp(th.from), b = wp(th.at);
+    await turnTo(player, angleOf(b.x - a.x, b.z - a.z), 140);
+    pc.mode = 'push';
+    const st = new THREE.Mesh(new THREE.DodecahedronGeometry(0.09, 0), new THREE.MeshStandardMaterial({ color: 0x8e8a80, flatShading: true }));
+    st.castShadow = true; board.add(st);
+    const h = 1.2 + a.distanceTo(b) * 0.12;
+    await tween(520, u => { st.position.lerpVectors(a, b, u); st.position.y = a.y + 1.1 * (1 - u) + Math.sin(Math.PI * u) * h; st.rotation.x += 0.3; });
+    pc.mode = 'idle';
+    const ring = new THREE.Mesh(G.ring, new THREE.MeshBasicMaterial({ color: 0xfff1c4, transparent: true, opacity: 0.9, depthWrite: false }));
+    ring.rotation.x = -Math.PI / 2; ring.position.set(b.x, b.y + 0.1, b.z); board.add(ring);
+    const alerted = ev.filter(e => e.k === 'alert');
+    const marks = alerted.map(e => { const sp = badge('!', '#f1d07a', '#2b2117', 'alerta'); const m = enemyMeshes[e.id]; sp.position.set(m.position.x, m.position.y + 1.6, m.position.z); sp.scale.set(0.5, 0.5, 1); board.add(sp); return sp; });
+    await Promise.all([
+      tween(420, u => { ring.scale.setScalar(0.6 + u * 1.8); ring.material.opacity = 0.9 * (1 - u); st.position.y = b.y + 0.06; }),
+      ...alerted.map(e => { const en = r.s.en[e.id]; if (en.t !== 'sentry') return null; const [dx, dz] = faceVec(LV, en); return turnTo(enemyMeshes[e.id], angleOf(dx, dz), 260); }),
+    ]);
+    board.remove(ring); setTimeout(() => { board.remove(st); marks.forEach(m => board.remove(m)); }, 900);
+  } else if (pm.blocked) {
     const mid = from.clone().lerp(to, 0.38);
     await walkTo(player, from, mid, 240);
     pc.mode = 'walk';
     await tween(220, u => { player.position.lerpVectors(mid, from, smooth(u)); });
     pc.mode = 'idle';
-  } else await walkTo(player, from, to);
+  } else if (push) {
+    // empuja el cajón: camina detrás y el cajón se corre un casillero
+    const cm = crateMeshes.get(push.from); crateMeshes.delete(push.from); crateMeshes.set(push.to, cm);
+    const c0 = wp(push.from), c1 = wp(push.to);
+    pc.mode = 'push';
+    await Promise.all([walkTo(player, from, to, 560), tween(560, u => { cm && cm.position.lerpVectors(c0, c1, smooth(u)); })]);
+    pc.mode = 'idle';
+  } else if (!th) await walkTo(player, from, to);
+  if (pick) {   // junta la piedra
+    const m = itemMeshes.get(pick.at), p0 = m.position.clone();
+    await tween(300, u => { m.position.y = p0.y + Math.sin(Math.PI * u) * 0.6 + u * 0.4; m.scale.setScalar(1 - u); });
+    m.visible = false;
+  }
   const td = ev.find(e => e.k === 'takedown');
   if (td) {
     pc.mode = 'push';
@@ -488,6 +557,11 @@ async function playTurn(prev, r) {
     return turnTo(enemyMeshes[i], angleOf(dx, dz));
   }));
   if (TDEC) TDEC.setDoors(r.s.moves, true, tween);
+  if (TDEC && TDEC.setLights) TDEC.setLights(r.s.moves, r.s.crates);
+  const barks = ev.filter(e => e.k === 'bark');
+  if (barks.length) { barks.forEach(b => { chOf(enemyMeshes[b.id]).mode = 'bark'; }); await tween(380, () => {}); barks.forEach(b => { chOf(enemyMeshes[b.id]).mode = 'idle'; }); }
+  const lightHit = caught && caught.light !== undefined;
+  if (lightHit) { pc.mode = 'surprised'; await tween(500, () => {}); }
   const trainsEv = ev.filter(e => e.k === 'train');
   if (trainsEv.length && TDEC) {
     const hitTr = caught && caught.train !== undefined;
@@ -502,7 +576,10 @@ async function playTurn(prev, r) {
   }
   if (caught && caught.id !== undefined) {
     const e = r.s.en[caught.id];
-    await caughtAnim(enemyMeshes[caught.id], wp(e.pos), wp(r.s.p));
+    if (e.t === 'dog') {   // el perro muerde
+      const dm = enemyMeshes[caught.id]; chOf(dm).mode = 'push'; pc.mode = 'surprised';
+      await tween(520, () => {});
+    } else await caughtAnim(enemyMeshes[caught.id], wp(e.pos), wp(r.s.p));
   }
   if (ev.some(e => e.k === 'win')) {
     pc.mode = 'cheer';
@@ -516,7 +593,12 @@ async function playTurn(prev, r) {
 async function tryMove(to) {
   if (busy || state.over) return;
   const r = step(LV, state, to);
-  if (!r) { if (LV.adj.get(state.p).has(to)) toast('La puerta está cerrada. Mirá el número: en esos turnos se abre.'); return; }
+  if (!r) {
+    if (state.crates.includes(to)) toast('El cajón no se puede correr para ese lado: algo lo traba.');
+    else if (LV.adj.get(state.p).has(to)) toast('La puerta está cerrada. Mirá el número: en esos turnos se abre.');
+    return;
+  }
+  throwMode = false;
   hist.push(state);
   const prev = state;
   state = r.s; hintKey = null; busy = true;
@@ -525,7 +607,7 @@ async function tryMove(to) {
   drawMarkers();
   updateHud();
   await playTurn(prev, r);
-  busy = false;
+  busy = false; updateStoneBtn();
   drawMarkers();
   afterTurn();
 }
@@ -547,6 +629,16 @@ function afterTurn() {
       : `Lo hiciste en ${n} movidas. El camino más corto tiene ${min}.`;
     $('#winNext').textContent = idx < LEVELS.length - 1 ? 'Siguiente' : 'Ver niveles';
     $('#winBox').hidden = false;
+  } else if (state.over === 'caught' && state.by === 'light') {
+    const who = chOf(player).name;
+    $('#lostTitle').textContent = `Los faros iluminaron a ${who}`;
+    $('#lostTxt').textContent = 'No te quedes en la luz de un camión. Un cajón corta el haz, y el que parpadea avisa en cuántos turnos se apaga.';
+    $('#lostBox').hidden = false;
+  } else if (state.over === 'caught' && state.en[state.by] && state.en[state.by].t === 'dog') {
+    const who = chOf(player).name;
+    $('#lostTitle').textContent = `El perro alcanzó a ${who}`;
+    $('#lostTxt').textContent = 'Si pasás a dos casilleros o menos, el perro te sigue. Pero su cadena no da más que hasta el círculo: alejalo y rodealo, o distraelo con una piedra.';
+    $('#lostBox').hidden = false;
   } else if (state.over === 'caught' && state.by === 'train') {
     const who = chOf(player).name;
     $('#lostTitle').textContent = `La máquina pasó por encima de ${who}`;
@@ -586,6 +678,7 @@ function hint() {
   const r = solve(LV, state);
   if (r && r.path) {
     hintKey = r.path[0];
+    if (hintKey.startsWith('T:')) { hintKey = hintKey.slice(2); throwMode = true; updateStoneBtn(); drawMarkers(); toast(`Tirá la piedra al punto dorado. Te faltan ${r.path.length} movidas.`); return; }
     drawMarkers();
     toast(`Andá al punto dorado. Te faltan ${r.path.length} movidas.`);
   } else {
@@ -642,6 +735,22 @@ function openLevels() {
 $('#bUndo').onclick = undo;
 $('#bRestart').onclick = restart;
 $('#bHint').onclick = hint;
+// Botón de la piedra: aparece en los niveles con piedras
+function updateStoneBtn() {
+  const b = $('#bStone'); if (!b) return;
+  const show = !!(LVD.stones || LVD.carry);
+  b.hidden = !show;
+  if (!show) return;
+  b.disabled = busy || !!state.over || !state.stones;
+  b.classList.toggle('on', throwMode);
+  $('#stoneN').textContent = state.stones || 0;
+}
+function toggleThrow() {
+  if (busy || state.over || !state.stones) { if (!state.stones) toast('Primero juntá una piedra del suelo.'); return; }
+  throwMode = !throwMode; updateStoneBtn(); drawMarkers();
+  if (throwMode) toast('Tocá un punto dorado para tirar la piedra. Los guardias de al lado miran el ruido.');
+}
+$('#bStone').onclick = toggleThrow;
 $('#bLevels').onclick = openLevels;
 $('#lvClose').onclick = () => { $('#lvSheet').hidden = true; };
 $('#lostUndo').onclick = undo;
@@ -688,6 +797,11 @@ canvas.addEventListener('pointerup', e => {
   ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
   ray.setFromCamera(ptr, cam);
   const hits = ray.intersectObjects(hitMeshes, false);
+  if (throwMode) {
+    const tg = throwTargets(LV, state), h = hits.find(x => tg.includes(x.object.userData.k));
+    if (h) tryMove('T:' + h.object.userData.k); else { throwMode = false; updateStoneBtn(); drawMarkers(); }
+    return;
+  }
   // elegir el punto vecino más cercano al toque
   const nb = LV.adj.get(state.p);
   const h = hits.find(x => nb.has(x.object.userData.k));
@@ -695,6 +809,7 @@ canvas.addEventListener('pointerup', e => {
 });
 // Teclado: flechas o WASD, Z deshacer, R reiniciar, H pista
 window.addEventListener('keydown', e => {
+  if (e.key === 'p' || e.key === 'P') { toggleThrow(); return; }
   const map = { ArrowUp: 'N', w: 'N', ArrowDown: 'S', s: 'S', ArrowLeft: 'W', a: 'W', ArrowRight: 'E', d: 'E' };
   const dir = map[e.key];
   if (dir) {
@@ -798,7 +913,7 @@ function threatPoints(box) {
   const pts = [];
   for (const e of state.en) {
     if (!e.alive) continue;
-    const f = facing(LV, e), seen = sight(LV, e, state.moves);
+    const f = facing(LV, e), seen = sight(LV, e, state.moves, state);
     let near = inBox(e.pos, box, 0.5) || seen.some(k => inBox(k, box));
     if (!near && e.t === 'patrol') {
       let ri = e.ri, rd = e.rdir;
@@ -1008,7 +1123,8 @@ CHARS.onModel = kind => {
   // Guardias: se reemplazan en el mismo lugar y con la misma orientación
   if ((kind === 'vigia' || kind === 'sereno') && board && !busy && state) {
     enemyMeshes = enemyMeshes.map((m, i) => {
-      const e = state.en[i], want = e.t === 'sentry' && (e.range || 1) === 1 ? 'vigia' : 'sereno';
+      const e = state.en[i]; if (e.t === 'dog') return m;
+      const want = e.t === 'sentry' && (e.range || 1) === 1 ? 'vigia' : 'sereno';
       if (want !== kind) return m;
       const n = CHARS.build(kind); n.scale.copy(m.scale); n.position.copy(m.position); n.quaternion.copy(m.quaternion);
       n.userData.face = m.userData.face; chOf(n).mode = chOf(m).mode;
@@ -1031,5 +1147,6 @@ CHARS.loadModel('zorro', 'zorro_model.js');
 CHARS.loadModel('corona', 'corona_model.js');
 DECOR.loadProps('escenario_model.js');
 TREN.loadKit('trasandino_model.js');
+TREN.loadKit('playa_model.js', () => CHARS.notify('perro'), 'KIT_PLAYA');
 window.claude?.hot?.snapshot?.(() => ({ ch: charKind, li: idx, path: hist.concat([state]).slice(1).map(s => s.p) }));
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});

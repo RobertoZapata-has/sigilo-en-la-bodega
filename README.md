@@ -12,6 +12,7 @@ Se puede instalar en el celular con el botón **Instalar** y después se juega s
 |---|----------|---------|----------------|
 | 1 | La finca | El tapial · Por la espalda · La ronda · La acequia · El patio de la bodega · La bodega | vigías, serenos con ronda, barricas que tapan la vista |
 | 2 | El Trasandino | La boletería · El andén · Las vías · Dentro del vagón · El techo del tren · El puente del río | guarda que gira, máquinas que pasan por las vías, puertas que se abren y se cierran, techos de los coches |
+| 3 | La playa de camiones | La báscula · Cajones · Los perros · Una piedra · Faros · El galpón de la cooperativa | capataz con farol, cajones que se empujan, perros con cadena, piedras para distraer, faros de camión |
 
 ## Cómo está hecho
 
@@ -19,7 +20,7 @@ Se puede instalar en el celular con el botón **Instalar** y después se juega s
 - `python3 tools/build.py` arma `docs/index.html`, que es lo que publica GitHub Pages.
 - `node tools/lab.js` comprueba que todos los niveles tengan solución y muestra el mínimo de movidas.
 - `node tools/search2.js tools/casos/c9.js` busca dónde poner a los guardias en un mapa.
-- `assets/modelos/` tiene los modelos de Blender: personajes, escenario de la bodega y el kit del Trasandino (`trasandino/`, con `trasandino_kit.blend`).
+- `assets/modelos/` tiene los modelos de Blender: personajes, escenario de la bodega, el kit del Trasandino (`trasandino/`) y el de la playa de camiones (`playa/`), cada uno con su `.blend`.
 - `assets/lugares/` tiene las ilustraciones de cada lugar, hechas con Canva.
 
 Sin frameworks: Three.js r128 desde cdnjs y un solo HTML.

@@ -82,6 +82,14 @@ button:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 3px; }
     radial-gradient(1px 1px at 93% 30%, rgba(255,255,255,.5), transparent 60%),
     linear-gradient(180deg, #0b1230 0%, #1d2a5a 55%, #44507e 88%, #6a6f93 100%);
 }
+.stage[data-sky="dia"] {
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 120' preserveAspectRatio='none'><path d='M0 120 L0 70 L30 48 L58 60 L92 18 L126 46 L150 34 L190 64 L226 22 L258 50 L296 10 L336 54 L364 40 L400 62 L400 120 Z' fill='%238d93b8'/><path d='M92 18 L106 32 L96 30 L86 28 L80 30 Z M226 22 L238 34 L228 33 L218 31 Z M296 10 L312 26 L300 24 L288 22 L282 25 Z M150 34 L158 40 L148 40 Z' fill='%23ffffff' opacity='.95'/></svg>") bottom / 100% 34% no-repeat,
+    radial-gradient(circle at 82% 14%, rgba(255,250,230,.95) 0 2.6%, rgba(255,244,210,.35) 4%, transparent 14%),
+    radial-gradient(ellipse 30% 8% at 22% 22%, rgba(255,255,255,.75), transparent 70%),
+    radial-gradient(ellipse 24% 6% at 62% 30%, rgba(255,255,255,.55), transparent 70%),
+    linear-gradient(180deg, #3d7fc4 0%, #74aee0 50%, #bcd9ef 82%, #e8eef0 100%);
+}
 .stage[data-sky="alba"] {
   background:
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 120' preserveAspectRatio='none'><path d='M0 120 L0 70 L30 48 L58 60 L92 18 L126 46 L150 34 L190 64 L226 22 L258 50 L296 10 L336 54 L364 40 L400 62 L400 120 Z' fill='%234a3a62'/><path d='M92 18 L106 32 L96 30 L86 28 L80 30 Z M226 22 L238 34 L228 33 L218 31 Z M296 10 L312 26 L300 24 L288 22 L282 25 Z M150 34 L158 40 L148 40 Z' fill='%23eef2ff' opacity='.85'/></svg>") bottom / 100% 34% no-repeat,
@@ -237,6 +245,12 @@ canvas#c { position: absolute; inset: 0; width: 100%; height: 100%; display: blo
 #chapBox.has-art { background: linear-gradient(180deg, rgba(9,11,24,.35) 0%, rgba(9,11,24,.55) 40%, rgba(9,11,24,.94) 78%), var(--art) center / cover no-repeat, var(--night); place-items: end center; padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px)); }
 #chapBox.has-art .chapter p { color: #ece6f6; text-shadow: 0 1px 8px rgba(0,0,0,.6); }
 #chapBox.has-art .chapter h2 { text-shadow: 0 3px 18px rgba(0,0,0,.6); }
+
+/* botón de la piedra */
+.db.stone .ic { position: relative; }
+.db.stone .cnt { position: absolute; right: -6px; top: -6px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--gold-hi, #f1d07a); color: #2b2117; font: 700 11px/18px var(--label, sans-serif); text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,.4); }
+.db.stone.on .ic { background: rgba(241,208,122,.25); box-shadow: 0 0 0 2px var(--gold-hi, #f1d07a) inset; }
+.db.stone:disabled .cnt { opacity: .5; }
 
 /* postal del lugar */
 .postal {
@@ -398,6 +412,7 @@ canvas#c { position: absolute; inset: 0; width: 100%; height: 100%; display: blo
       <button class="db" id="bUndo"><span class="ic"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span><span class="lb">Deshacer</span></button>
       <button class="db" id="bRestart"><span class="ic"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span><span class="lb">Reiniciar</span></button>
       <button class="db gold" id="bHint"><span class="ic"><svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg></span><span class="lb">Pista</span></button>
+      <button class="db stone" id="bStone" hidden><span class="ic"><svg viewBox="0 0 24 24"><path d="M5 15c0-4 3-8 7-8 3.5 0 7 2.6 7 6.5 0 3-2.6 5.5-7 5.5-4.4 0-7-1.4-7-4z"/><path d="M9 11.5c1-.8 2-1.2 3.2-1.2"/></svg><b class="cnt" id="stoneN">0</b></span><span class="lb">Piedra</span></button>
       <button class="db" id="bMap" aria-pressed="false" hidden><span class="ic"><svg viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14"/><path d="M15 6v14"/></svg></span><span class="lb">Mapa</span></button>
       <button class="db" id="bLevels"><span class="ic"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/><circle cx="19" cy="18" r="1.5"/></svg></span><span class="lb">Ruta</span></button>
     </nav>
@@ -528,6 +543,7 @@ function parseLevel(L) {
     }
   });
   const en = (L.enemies || []).map((e, id) => {
+    if (e.t === 'dog') return { id, t: 'dog', pos: K(...e.at), home: K(...e.at), leash: e.leash === undefined ? 2 : e.leash, smell: e.smell || 2, face: e.face || 'S', alive: true };
     if (e.t === 'sentry') {
       // con "turn", el vigía gira cada turno siguiendo esa lista de direcciones (guarda que gira)
       if (e.turn) { const ti = e.ti || 0; return { id, t: 'sentry', pos: K(...e.at), turn: e.turn, ti, face: e.turn[ti], range: e.range || 1, alive: true }; }
@@ -540,7 +556,7 @@ function parseLevel(L) {
     const ri = e.start || 0;
     let rdir = e.dir || 1;
     if (!e.loop && (ri + rdir < 0 || ri + rdir >= route.length)) rdir = -rdir;
-    return { id, t: 'patrol', route, loop: !!e.loop, ri, rdir, pos: route[ri], alive: true };
+    return { id, t: 'patrol', route, loop: !!e.loop, ri, rdir, pos: route[ri], range: e.range || 1, alive: true };
   });
   // Trenes que pasan cada tantos turnos por una fila de puntos (las vías)
   const trains = (L.trains || []).map(t => {
@@ -554,10 +570,18 @@ function parseLevel(L) {
     if (!adj.get(a) || !adj.get(a).has(b)) throw new Error(L.name + ': puerta sin camino ' + a + ' ' + b);
     return { a, b, every: d.every, open: d.open || 1, phase: d.phase || 0 };
   });
+  // Faros de camión: iluminan una fila de puntos desde "from" hacia "dir" (los tapa un cajón o una barrica)
+  const lights = (L.lights || []).map(l => {
+    const beam = []; let [x, y] = l.from; const [dx, dy] = DIRS[l.dir];
+    for (let i = 0; i < (l.len || 3); i++) { if (!nodes.has(K(x, y))) break; beam.push(K(x, y)); x += dx; y += dy; }
+    return { beam, dir: l.dir, every: l.every || 0, on: l.on || 1, phase: l.phase || 0, truck: l.truck };
+  });
   const gcd = (a, b) => b ? gcd(b, a % b) : a;
-  const period = [...trains.map(t => t.every), ...doors.map(d => d.every)].reduce((a, b) => a * b / gcd(a, b), 1);
-  const lv = { name: L.name, tip: L.tip, nodes, adj, start, goal, cover, trains, doors, period };
-  lv.s0 = { p: start, moves: 0, en, over: null };
+  const period = [...trains.map(t => t.every), ...doors.map(d => d.every), ...lights.filter(l => l.every).map(l => l.every)].reduce((a, b) => a * b / gcd(a, b), 1);
+  const lv = { name: L.name, tip: L.tip, nodes, adj, start, goal, cover, trains, doors, lights, period, throwRange: L.throwRange || 3 };
+  const crates = (L.crates || []).map(c => K(...c)).sort();
+  const items = (L.stones || []).map(c => K(...c)).sort();
+  lv.s0 = { p: start, moves: 0, en, over: null, crates, items, stones: L.carry || 0 };
   return lv;
 }
 
@@ -569,10 +593,53 @@ function canPass(lv, a, b, t) { if (!lv.adj.get(a).has(b)) return false; const d
 function trainPasses(tr, t) { return t > 0 && (t + tr.phase) % tr.every === 0; }
 function trainIn(tr, t) { const r = (t + tr.phase) % tr.every; return r === 0 ? tr.every : tr.every - r; }
 
+// Faros: ¿está prendido en el turno t? ¿Qué puntos ilumina?
+function lightOn(l, t) { return !l.every || ((t + l.phase) % l.every + l.every) % l.every < l.on; }
+function litNodes(lv, l, t, s) {
+  if (!lightOn(l, t)) return [];
+  const out = [];
+  for (const k of l.beam) { if ((s && s.crates && s.crates.includes(k)) || lv.cover.has(k)) break; out.push(k); }
+  return out;
+}
+// Distancias por los caminos (los cajones cortan el paso)
+function distances(lv, from, s, max = 99) {
+  const d = new Map([[from, 0]]); let q = [from];
+  while (q.length) {
+    const nq = [];
+    for (const k of q) for (const n of lv.adj.get(k)) {
+      if (d.has(n) || (s && s.crates && s.crates.includes(n))) continue;
+      d.set(n, d.get(k) + 1); if (d.get(n) < max) nq.push(n);
+    }
+    q = nq;
+  }
+  return d;
+}
+// Puntos a los que se puede tirar una piedra: en línea recta, hasta throwRange casilleros
+function throwTargets(lv, s) {
+  if (!s.stones) return [];
+  const out = [], [x, y] = P(s.p);
+  for (const [dx, dy] of Object.values(DIRS))
+    for (let i = 1; i <= lv.throwRange; i++) { const k = K(x + dx * i, y + dy * i); if (lv.nodes.has(k) && !(s.crates || []).includes(k)) out.push(k); }
+  return out;
+}
+// Acciones posibles: moverse a un vecino, o tirar una piedra ("T:x,y")
+function actions(lv, s) {
+  const a = [...lv.adj.get(s.p)];
+  for (const k of throwTargets(lv, s)) a.push('T:' + k);
+  return a;
+}
+// Dirección que más acerca de "a" a "b"
+function dirToward(a, b) {
+  const [ax, ay] = P(a), [bx, by] = P(b), dx = bx - ax, dy = by - ay;
+  if (Math.abs(dx) >= Math.abs(dy)) return dx > 0 ? 'E' : 'W';
+  return dy > 0 ? 'S' : 'N';
+}
+
 function nextIdx(e) {
   return e.loop ? (e.ri + 1) % e.route.length : e.ri + e.rdir;
 }
 function facing(lv, e) {
+  if (e.t === 'dog') return null;
   if (e.t === 'sentry') {
     const [x, y] = P(e.pos), [dx, dy] = DIRS[e.face];
     const n = K(x + dx, y + dy);
@@ -590,8 +657,23 @@ function nextFacing(lv, e) {
 }
 // Puntos que ve un guardia. El vigía con farol (range > 1) ve en línea recta hasta su alcance;
 // una barrica corta la vista y quien está en ella no se ve. El sereno solo "ve" su próximo paso.
-function sight(lv, e, t) {
-  if (e.t !== 'sentry') { const f = facing(lv, e); return f ? [f] : []; }
+function sight(lv, e, t, s) {
+  if (e.t === 'dog') return [];
+  if (e.t !== 'sentry') {
+    // el capataz con farol (patrulla con range) ve también los puntos que siguen en línea recta
+    const f = facing(lv, e); if (!f) return [];
+    const out = [f];
+    if ((e.range || 1) > 1) {
+      const [x0, y0] = P(e.pos), [x1, y1] = P(f), dx = x1 - x0, dy = y1 - y0;
+      let cur = f;
+      for (let i = 1; i < e.range; i++) {
+        const [x, y] = P(cur), n = K(x + dx, y + dy);
+        if (!lv.adj.get(cur).has(n) || lv.cover.has(n) || (s && s.crates && s.crates.includes(n))) break;
+        out.push(n); cur = n;
+      }
+    }
+    return out;
+  }
   const out = []; const [dx, dy] = DIRS[e.face];
   let cur = e.pos;
   for (let i = 0; i < (e.range || 1); i++) {
@@ -599,12 +681,13 @@ function sight(lv, e, t) {
     if (!lv.adj.get(cur).has(n)) break;
     if (t !== undefined && !canPass(lv, cur, n, t)) break;
     if (lv.cover && lv.cover.has(n)) break;
+    if (s && s.crates && s.crates.includes(n)) break;
     out.push(n); cur = n;
   }
   return out;
 }
 function faceVec(lv, e) {
-  if (e.t === 'sentry') return DIRS[e.face];
+  if (e.t === 'sentry' || e.t === 'dog') return DIRS[e.face];
   const [x, y] = P(e.pos), [fx, fy] = P(facing(lv, e));
   return [fx - x, fy - y];
 }
@@ -620,10 +703,39 @@ function advance(e) {
 // Un turno completo: mueve el jugador y después actúan los enemigos.
 // Devuelve el estado nuevo y la lista de eventos para animar.
 function step(lv, s, to) {
-  if (s.over || !canPass(lv, s.p, to, s.moves)) return null;
-  const ns = { p: to, moves: s.moves + 1, en: s.en.map(e => ({ ...e })), over: null, by: null };
-  const ev = [{ k: 'pmove', from: s.p, to }];
-  const hit = ns.en.find(e => e.alive && e.pos === to);
+  if (s.over) return null;
+  const crates0 = s.crates || [];
+  let throwAt = null;
+  if (to.startsWith('T:')) { throwAt = to.slice(2); if (!throwTargets(lv, s).includes(throwAt)) return null; to = s.p; }
+  else if (!canPass(lv, s.p, to, s.moves)) return null;
+  const ns = { p: to, moves: s.moves + 1, en: s.en.map(e => ({ ...e })), over: null, by: null, crates: crates0, items: s.items || [], stones: s.stones || 0 };
+  const ev = [];
+  if (throwAt) {
+    ns.stones--; ev.push({ k: 'throw', from: s.p, at: throwAt });
+    // los que están cerca del ruido se dan vuelta a mirar; los perros corren hacia la piedra
+    for (const e of ns.en) {
+      if (!e.alive) continue;
+      const [ex, ey] = P(e.pos), [tx, ty] = P(throwAt), md = Math.abs(ex - tx) + Math.abs(ey - ty);
+      if (e.t === 'sentry' && !e.turn && md > 0 && md <= 2) { e.face = dirToward(e.pos, throwAt); ev.push({ k: 'alert', id: e.id }); }
+      if (e.t === 'dog' && md <= 3) { e.lure = throwAt; ev.push({ k: 'alert', id: e.id }); }
+    }
+  } else {
+    ev.push({ k: 'pmove', from: s.p, to });
+    // empujar un cajón
+    if (crates0.includes(to)) {
+      const [px, py] = P(s.p), [tx, ty] = P(to), nx = K(2 * tx - px, 2 * ty - py);
+      const blocked = !lv.nodes.has(nx) || !canPass(lv, to, nx, s.moves) || crates0.includes(nx) || nx === lv.goal || lv.cover.has(nx)
+        || (s.items || []).includes(nx) || s.en.some(e => e.alive && e.pos === nx);
+      if (blocked) return null;
+      ns.crates = crates0.map(c => c === to ? nx : c).sort();
+      ev.push({ k: 'push', from: to, to: nx });
+    }
+    if (ns.items.includes(to)) { ns.items = ns.items.filter(k => k !== to); ns.stones++; ev.push({ k: 'pick', at: to }); }
+  }
+  const hit = !throwAt && ns.en.find(e => e.alive && e.pos === to);
+  if (hit && hit.t === 'dog') {   // a un perro no se lo agarra: muerde
+    ns.p = s.p; ev[0].blocked = true; ns.over = 'caught'; ns.by = hit.id; ev.push({ k: 'caught', id: hit.id }); return { s: ns, ev };
+  }
   if (hit) {
     if (facing(lv, hit) === s.p) { // entraste de frente
       ns.p = s.p; ns.front = true; ev[0].blocked = true;
@@ -634,14 +746,40 @@ function step(lv, s, to) {
   if (to === lv.goal) { ns.over = 'won'; ev.push({ k: 'win' }); return { s: ns, ev }; }
   for (const e of ns.en) {
     if (!e.alive) continue;
+    if (e.t === 'dog') {
+      // el perro olfatea: si estás a "smell" pasos o menos, viene; si no, vuelve a su cucha. No se aleja más de "leash" de la cucha.
+      const dHome = distances(lv, e.home, ns);
+      const target = e.lure || null; delete e.lure;
+      const dP = distances(lv, ns.p, ns);
+      let goal = target;
+      if (!goal && (dP.get(e.pos) ?? 99) <= e.smell) goal = ns.p;
+      if (!goal && e.pos !== e.home) goal = e.home;
+      if (!goal) continue;
+      const dG = goal === ns.p ? dP : distances(lv, goal, ns);
+      let best = null;
+      for (const n of lv.adj.get(e.pos)) {
+        if ((dHome.get(n) ?? 99) > e.leash) continue;
+        if (ns.crates.includes(n) || ns.en.some(o => o !== e && o.alive && o.pos === n)) continue;
+        if ((dG.get(n) ?? 99) < (dG.get(e.pos) ?? 99) && (!best || (dG.get(n) < dG.get(best)))) best = n;
+      }
+      if (!best) { if (goal === ns.p) ev.push({ k: 'bark', id: e.id }); continue; }
+      const from = e.pos; e.face = dirToward(from, best); e.pos = best;
+      ev.push({ k: 'emove', id: e.id, from, to: best, dog: true });
+      if (best === ns.p) { ns.over = 'caught'; ns.by = e.id; ev.push({ k: 'caught', id: e.id, bite: true }); return { s: ns, ev }; }
+      continue;
+    }
     if (e.turn) { e.ti = (e.ti + 1) % e.turn.length; e.face = e.turn[e.ti]; ev.push({ k: 'eturn', id: e.id }); }
     const f = facing(lv, e);
-    if (sight(lv, e, ns.moves).includes(ns.p)) { ns.over = 'caught'; ns.by = e.id; ev.push({ k: 'caught', id: e.id, lunge: true }); return { s: ns, ev }; }
+    if (sight(lv, e, ns.moves, ns).includes(ns.p)) { ns.over = 'caught'; ns.by = e.id; ev.push({ k: 'caught', id: e.id, lunge: true }); return { s: ns, ev }; }
     if (e.t === 'patrol') {
-      if (ns.en.some(o => o !== e && o.alive && o.pos === f)) { ev.push({ k: 'wait', id: e.id }); continue; }
+      if (ns.crates.includes(f) || ns.en.some(o => o !== e && o.alive && o.pos === f)) { ev.push({ k: 'wait', id: e.id }); continue; }
       const from = e.pos; advance(e);
       ev.push({ k: 'emove', id: e.id, from, to: e.pos });
     }
+  }
+  // faros: si quedás en la luz, te ven
+  for (let i = 0; i < lv.lights.length; i++) {
+    if (litNodes(lv, lv.lights[i], ns.moves, ns).includes(ns.p)) { ns.over = 'caught'; ns.by = 'light'; ns.light = i; ev.push({ k: 'caught', light: i }); return { s: ns, ev }; }
   }
   // el tren pasa: si estás en las vías, te lleva puesto
   for (let i = 0; i < (lv.trains || []).length; i++) {
@@ -654,7 +792,7 @@ function step(lv, s, to) {
 }
 
 let PERIOD = 1;
-const keyOf = s => s.p + '|' + (PERIOD > 1 ? s.moves % PERIOD : '') + '|' + s.en.map(e => e.alive ? e.pos + ':' + e.ri + ':' + e.rdir + ':' + (e.turn ? e.ti : '') : 'x').join(';');
+const keyOf = s => s.p + '|' + (PERIOD > 1 ? s.moves % PERIOD : '') + '|' + (s.crates || []).join('/') + '|' + (s.items || []).join('/') + '|' + (s.stones || 0) + '|' + s.en.map(e => e.alive ? e.pos + ':' + e.ri + ':' + e.rdir + ':' + (e.turn ? e.ti : e.face || '') : 'x').join(';');
 
 // Resolvedor: búsqueda en anchura sobre todos los estados posibles.
 // Devuelve la secuencia más corta de casillas o null si no hay salida.
@@ -665,7 +803,7 @@ function solve(lv, s0, limit = 200000) {
   while (q.length) {
     const nq = [];
     for (const s of q) {
-      for (const to of lv.adj.get(s.p)) {
+      for (const to of actions(lv, s)) {
         const r = step(lv, s, to);
         if (!r || r.s.over === 'caught') continue;
         const k = keyOf(r.s);
@@ -686,7 +824,7 @@ function solve(lv, s0, limit = 200000) {
   return { path: null, explored: seen.size };
 }
 
-if (typeof module !== 'undefined') module.exports = { parseLevel, step, solve, facing, nextFacing, sight, faceVec, doorAt, doorOpen, canPass, trainPasses, trainIn, keyOf, K, P, DIRS };
+if (typeof module !== 'undefined') module.exports = { parseLevel, step, solve, facing, nextFacing, sight, faceVec, doorAt, doorOpen, canPass, trainPasses, trainIn, keyOf, actions, throwTargets, litNodes, lightOn, distances, K, P, DIRS };
 
 const LEVELS = [
   {
@@ -947,6 +1085,146 @@ const LEVELS = [
       { t: 'sentry', at: [1, 0], turn: ['N', 'E', 'S', 'W'], ti: 2 },
     ],
   },
+  {
+    name: 'La báscula',
+    art: 'lugares/bascula.jpg',
+    chapter: 'Capítulo 3 · La playa de camiones',
+    intro: 'En Cacheuta, un peón vio bajar un cajón de uva marcado con tiza. Se lo llevaron en un camión de la cosecha a la playa de la cooperativa. Pedro y Clara llegan con el sol, cuando los camiones hacen fila para pesar la carga.',
+    tip: 'El capataz del farol hace su ronda y ve dos casilleros hacia adelante. Mirá bien la línea que ilumina antes de cruzarle por delante.',
+    theme: 'playa', scene: 'bascula', sky: 'dia', place: 'La báscula',
+    pad: { l: 1.4, r: 1.4, t: 2.3, b: 1.5 },
+    map: [
+      'S-o-o-o-o-o',
+      '|   |     |',
+      'o-o-o-o-o-o',
+      '|     |   |',
+      'o-o-o-o-o-G',
+    ],
+    enemies: [
+      { t: 'patrol', route: [[1, 2], [2, 2], [3, 2], [4, 2]], range: 2, start: 2 },
+      { t: 'sentry', at: [5, 1], face: 'W' },
+      { t: 'sentry', at: [2, 0], turn: ['W', 'N', 'E', 'S'], ti: 3 },
+    ],
+  },
+  {
+    name: 'Cajones',
+    art: 'lugares/cajones.jpg',
+    chapter: 'Capítulo 3 · La playa de camiones',
+    tip: 'Los cajones de uva se empujan: caminá hacia uno y se corre un casillero. Un cajón tapa la vista del farol.',
+    theme: 'playa', scene: 'cajones', sky: 'dia', place: 'Las pilas de cajones',
+    pad: { l: 1.5, r: 1.5, t: 1.8, b: 1.6 },
+    map: [
+      'S-o-o-o-o-o',
+      '|   |   | |',
+      'o-o-o-o-o-o',
+      '|   |   | |',
+      'o-o-o-o-o-G',
+    ],
+    crates: [[1, 1], [3, 2]],
+    enemies: [
+      { t: 'sentry', at: [5, 1], face: 'S', range: 3 },
+      { t: 'sentry', at: [4, 2], face: 'N', range: 3 },
+      { t: 'sentry', at: [2, 2], face: 'W' },
+      { t: 'patrol', route: [[1, 2], [2, 2], [3, 2], [4, 2]], start: 0 },
+    ],
+  },
+  {
+    name: 'Los perros',
+    art: 'lugares/perros.jpg',
+    chapter: 'Capítulo 3 · La playa de camiones',
+    tip: 'La banda soltó los perros. Si pasás a dos casilleros o menos, el perro te sigue; pero tiene una cadena y no se aleja de su cucha. A un perro no lo podés sacar del medio.',
+    theme: 'playa', scene: 'perros', sky: 'dia', place: 'El corral de los perros',
+    pad: { l: 1.5, r: 1.5, t: 1.6, b: 1.6 },
+    map: [
+      'S-o-o-o-o-o',
+      '|   |   |  ',
+      'o-o-o-o-o-o',
+      '  |   |   |',
+      'o-o-o-o-o-o',
+      '|   |   |  ',
+      'o-o-o-o-o-G',
+    ],
+    enemies: [
+      { t: 'dog', at: [2, 3], leash: 2, smell: 2 },
+      { t: 'dog', at: [2, 1], leash: 2, smell: 2 },
+      { t: 'sentry', at: [4, 0], face: 'S' },
+    ],
+  },
+  {
+    name: 'Una piedra',
+    art: 'lugares/piedra.jpg',
+    chapter: 'Capítulo 3 · La playa de camiones',
+    tip: 'Juntá la piedra del suelo. Con el botón Piedra la tirás hasta tres casilleros en línea recta: los guardias cercanos se dan vuelta a mirar el ruido y los perros corren hacia ella.',
+    theme: 'playa', scene: 'piedra', sky: 'tarde', place: 'Entre los camiones',
+    pad: { l: 1.5, r: 1.5, t: 1.8, b: 1.8 },
+    map: [
+      'S-o-o-o-o-o',
+      '|   |   | |',
+      'o-o-o-o-o-o',
+      '|     |   |',
+      'o-o-o-o-o-G',
+    ],
+    stones: [[1, 0]],
+    enemies: [
+      { t: 'sentry', at: [0, 2], face: 'E' },
+      { t: 'sentry', at: [4, 0], face: 'W', range: 2 },
+      { t: 'sentry', at: [2, 2], face: 'W' },
+      { t: 'dog', at: [3, 1], leash: 1, smell: 2 },
+    ],
+  },
+  {
+    name: 'Faros',
+    art: 'lugares/faros.jpg',
+    chapter: 'Capítulo 3 · La playa de camiones',
+    tip: 'Los camiones tienen los faros prendidos: si quedás en la luz, te ven. Uno parpadea (mirá el cartelito); al otro lo podés tapar empujando un cajón.',
+    theme: 'playa', scene: 'faros', sky: 'anochecer', place: 'La salida de los camiones',
+    pad: { l: 2.9, r: 2.9, t: 1.6, b: 1.6 },
+    map: [
+      'S-o-o-o-o-o',
+      '|   |   | |',
+      'o-o-o-o-o-o',
+      '|   |   | |',
+      'o-o-o-o-o-o',
+      '  |   |   |',
+      'o-o-o-o-o-G',
+    ],
+    lights: [{ from: [0, 1], dir: 'E', len: 6, every: 3, on: 2, phase: 0 }, { from: [5, 2], dir: 'W', len: 6 }],
+    crates: [[4, 1], [2, 3]],
+    enemies: [
+      { t: 'sentry', at: [2, 0], face: 'S' },
+      { t: 'sentry', at: [3, 0], face: 'E', range: 2 },
+      { t: 'patrol', route: [[0, 3], [1, 3], [2, 3], [3, 3]], range: 2, start: 3 },
+    ],
+  },
+  {
+    name: 'El galpón de la cooperativa',
+    art: 'lugares/galpon.jpg',
+    chapter: 'Capítulo 3 · La playa de camiones',
+    tip: 'Todo junto: el capataz del farol, el perro, los faros que parpadean, un cajón para taparte y una piedra para distraer.',
+    outro: 'Adentro del galpón está el cajón marcado con tiza, pero vacío. Clavada en la madera hay una nota con la letra del Zorro: “La reina saluda desde su carro. Nos vemos en la Vía Blanca.” La corona va escondida en un carro alegórico del desfile.',
+    outroTitle: 'Una nota en el cajón',
+    theme: 'playa', scene: 'galpon', sky: 'noche', place: 'El galpón de la cooperativa',
+    pad: { l: 1.6, r: 2.9, t: 2.8, b: 1.6 },
+    map: [
+      'S-o-o-o-o-o-o',
+      '|   |   |   |',
+      'o-o-o-o-o-o-o',
+      '|     |     |',
+      'o-o-o-o-o-o-o',
+      '  |   |   |  ',
+      'o-o-o-o-o-o-G',
+    ],
+    lights: [{ from: [6, 2], dir: 'W', len: 7, every: 4, on: 3, phase: 1 }],
+    crates: [[3, 1]],
+    stones: [[0, 2]],
+    enemies: [
+      { t: 'dog', at: [3, 0], leash: 2, smell: 2 },
+      { t: 'patrol', route: [[1, 3], [2, 3], [3, 3], [4, 3], [5, 3]], range: 2, start: 2 },
+      { t: 'sentry', at: [5, 0], face: 'E', range: 3 },
+      { t: 'sentry', at: [1, 1], turn: ['E', 'S', 'W', 'N'], ti: 0 },
+      { t: 'sentry', at: [4, 0], face: 'E' },
+    ],
+  },
 ];
 if (typeof module !== 'undefined') module.exports = LEVELS;
 
@@ -1149,7 +1427,71 @@ const CHARS = (() => {
     ch.mixer.update(dt);
   }
 
+  // ---------- El perro de la banda ----------
+  // Usa la pieza "perro" del kit de la playa (hecha en Blender con patas, cabeza y cola sueltas);
+  // mientras no carga, un perro de formas simples. Mira hacia +Z como los demás.
+  function buildDog() {
+    const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
+    const parts = { legs: [], head: null, tail: null };
+    const kit = (typeof TREN !== 'undefined' && TREN.kitClone) ? TREN.kitClone('perro') : null;
+    let inner;
+    if (kit) {
+      inner = kit;
+      inner.traverse(o => {
+        if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; }
+        const n = o.name || '';
+        if (n.startsWith('perro_pata')) parts.legs.push(o);
+        else if (n.startsWith('perro_cabeza') && !parts.head) parts.head = o;
+        else if (n.startsWith('perro_cola') && !parts.tail) parts.tail = o;
+      });
+      parts.legs = parts.legs.filter(o => !o.isMesh || !o.parent || !(o.parent.name || '').startsWith('perro_pata'));
+    } else {
+      inner = new THREE.Group();
+      const fur = mat(0xa8783e), dark = mat(0x5a3c22), light = mat(0xd8bf94);
+      const b = new THREE.Mesh(new THREE.SphereGeometry(0.2, 14, 10), fur); b.scale.set(1.9, 0.9, 0.85); b.position.y = 0.42; inner.add(b);
+      const hp = new THREE.Group(); hp.position.set(0.33, 0.52, 0); inner.add(hp);
+      const h = new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 10), fur); h.position.set(0.1, 0.08, 0); hp.add(h);
+      const sn = new THREE.Mesh(new THREE.SphereGeometry(0.07, 10, 8), light); sn.scale.set(1.3, 0.8, 0.7); sn.position.set(0.23, 0.04, 0); hp.add(sn);
+      [-0.06, 0.06].forEach(z => { const e = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.12, 4), dark); e.position.set(0.05, 0.22, z); hp.add(e); });
+      parts.head = hp;
+      const tp = new THREE.Group(); tp.position.set(-0.33, 0.5, 0); inner.add(tp);
+      const t = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.012, 0.3, 8), fur); t.position.set(-0.1, 0.11, 0); t.rotation.z = 0.7; tp.add(t);
+      parts.tail = tp;
+      [[0.25, -0.1], [0.25, 0.1], [-0.27, -0.1], [-0.27, 0.1]].forEach(([x, z]) => {
+        const lp = new THREE.Group(); lp.position.set(x, 0.42, z); inner.add(lp);
+        const l = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.035, 0.42, 8), fur); l.position.y = -0.21; lp.add(l);
+        parts.legs.push(lp);
+      });
+      inner.traverse(o => { if (o.isMesh) o.castShadow = true; });
+    }
+    inner.rotation.y = -Math.PI / 2;      // la trompa del perro (+X en Blender) mira a +Z
+    inner.scale.setScalar(0.98);
+    body.add(inner);
+    parts.legs.forEach(l => { l.userData.r0 = l.rotation.clone(); });
+    if (parts.head) parts.head.userData.r0 = parts.head.rotation.clone();
+    if (parts.tail) parts.tail.userData.r0 = parts.tail.rotation.clone();
+    const ch = { kind: 'perro', name: 'Perro', color: 0x7a1f36, root, mode: 'idle', phase: 0, stepRate: 16, seed: Math.random() * 10, dog: parts, body };
+    root.userData.ch = ch;
+    ALL.push(ch);
+    return root;
+  }
+  function animateDog(ch, dt, t) {
+    const P = ch.dog, walk = ch.mode === 'walk', bite = ch.mode === 'push' || ch.mode === 'surprised';
+    if (walk) ch.phase += dt * ch.stepRate;
+    P.legs.forEach((l, i) => {
+      const r0 = l.userData.r0, sw = walk ? Math.sin(ch.phase + (i === 0 || i === 3 ? 0 : Math.PI)) * 0.55 : 0;
+      // en el espacio del perro las patas giran alrededor de su eje Z (de costado)
+      l.rotation.z = r0.z + sw;
+    });
+    if (P.tail) P.tail.rotation.y = P.tail.userData.r0.y + Math.sin(t * (walk ? 14 : 9) + ch.seed) * (bite ? 0.1 : 0.55);
+    if (P.head) P.head.rotation.z = P.head.userData.r0.z + (ch.mode === 'bark' ? Math.abs(Math.sin(t * 16)) * 0.35 : bite ? 0.25 : Math.sin(t * 1.6 + ch.seed) * 0.06);
+    const y = walk ? Math.abs(Math.sin(ch.phase)) * 0.03 : 0;
+    ch.body.position.y += (y - ch.body.position.y) * Math.min(1, dt * 14);
+    ch.body.position.z += ((bite ? 0.25 : 0) - ch.body.position.z) * Math.min(1, dt * 12);
+  }
+
   function build(kind) {
+    if (kind === 'perro') return buildDog();
     if (MODELS[kind]) return buildModel(kind);
     const P = PAL[kind];
     const root = new THREE.Group();
@@ -1339,12 +1681,12 @@ const CHARS = (() => {
       const ch = ALL[i];
       if (ch.dead) { ALL.splice(i, 1); continue; }
       if (!ch.root.parent) continue;
-      if (ch.model) animateModel(ch, dt, t); else animate(ch, dt, t);
+      if (ch.dog) animateDog(ch, dt, t); else if (ch.model) animateModel(ch, dt, t); else animate(ch, dt, t);
     }
   }
   function release(root) { if (root && root.userData.ch) root.userData.ch.dead = true; }
 
-  return { build, tick, release, PAL, loadModel, has: k => !!MODELS[k], set onModel(f) { onModel = f; } };
+  return { build, tick, release, PAL, loadModel, has: k => !!MODELS[k], set onModel(f) { onModel = f; }, notify: k => onModel && onModel(k) };
 })();
 
 // ===== ESCENARIOS: maquetas hechas en código =====
@@ -2036,11 +2378,11 @@ const TREN = (() => {
   let slots = [];
 
   // ---------- carga de piezas ----------
-  function loadKit(url, done) {
+  function loadKit(url, done, varName = 'KIT_B64') {
     if (!THREE.GLTFLoader) return;
     const s = document.createElement('script'); s.src = url; s.async = true;
     s.onload = () => {
-      const all = window.KIT_B64 || {}; delete window.KIT_B64;
+      const all = window[varName] || {}; delete window[varName];
       const names = Object.keys(all); let left = names.length;
       const fin = () => { if (--left === 0) { applyKit(); if (done) done(); } };
       names.forEach(n => {
@@ -2103,6 +2445,11 @@ const TREN = (() => {
       }
       const w = new THREE.Group(); w.add(o); w.position.y = opt.y || 0; return w;
     });
+  }
+
+  function kitClone(name) {
+    if (!has(name)) return null;
+    const o = clone(name), w = new THREE.Group(); w.add(o); return w;
   }
 
   // ---------- piezas sueltas ----------
@@ -2391,6 +2738,9 @@ const TREN = (() => {
       snowPatches(board, toW, [3.8, by0 + 0.2, bx1 - 0.3, by1 - 0.2], 7, 9);
     }
 
+    // ===== CAPÍTULO 3: LA PLAYA DE CAMIONES =====
+    if (LVD.theme === 'playa') buildPlaya(scene, board, toW, LV, LVD, box, add, api);
+
     // los trenes de paso: se arman una vez y se esconden hasta que pasan
     api.trains.forEach((tr, i) => {
       const set = trainSet([['loco'], ['furgon', 3.2], ['furgon', 3.2]]);
@@ -2401,6 +2751,8 @@ const TREN = (() => {
     let tNow = 0;
     return {
       update(t) { tNow = t; api.tick.forEach(f => f(t)); api.trains.forEach(tr => { if (tr.set.visible) tr.set.userData.parts[0].userData.smoke(t, 2.5); }); },
+      // faros: prende o apaga cada haz y lo corta donde hay un cajón
+      setLights(t, crates) { (api.beams || []).forEach(b => b.set(t, crates)); },
       // el tren cruza de punta a punta (dir 1: de izquierda a derecha)
       passTrain(i, tween) {
         const tr = api.trains[i]; if (!tr) return Promise.resolve();
@@ -2424,7 +2776,117 @@ const TREN = (() => {
     };
   }
 
-  return { loadKit, build, has, applyKit };
+  // ---------- piezas del capítulo 3 ----------
+  const PAINTS = [0x4f8c8a, 0x9a3b2a, 0xc9a33a, 0x5b6f8f, 0x6f8a4a];
+  function camion(color, lightsOn = false) {
+    return piece('camion', { s: 0.92 }, () => {
+      const g = new THREE.Group(), m = mat(color || 0x4f8c8a, { roughness: 0.5 });
+      const cab = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.2, 1.3), m); cab.position.set(0.9, 0.95, 0); g.add(cab);
+      const bed = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.7, 1.4), mat(0x9a7046)); bed.position.set(-0.9, 0.9, 0); g.add(bed);
+      return shadow(g);
+    });
+  }
+  function paintTruck(g, color) {   // cada camión de otro color: se clona el material de la pintura
+    g.traverse(o => { if (o.isMesh && o.material && o.material.name === 'sk_camion_pintura') { o.material = o.material.clone(); o.material.color.set(color); } });
+  }
+  function crateMesh() { return piece('cajon', { s: 1.05 }, () => { const g = P.crate(0.75); return g; }); }
+  function stonePile() {
+    const g = new THREE.Group(), m = mat(0x8e8a80, { roughness: 0.9, flatShading: true });
+    [[0, 0, 0.1], [0.12, 0.06, 0.07], [-0.1, 0.08, 0.06], [0.04, -0.1, 0.065]].forEach(([x, z, r]) => { const st = new THREE.Mesh(new THREE.DodecahedronGeometry(r, 0), m); st.position.set(x, r * 0.7, z); st.castShadow = true; g.add(st); });
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.26, 0.31, 32), new THREE.MeshBasicMaterial({ color: 0xd8b25e, transparent: true, opacity: 0.8 }));
+    ring.rotation.x = -Math.PI / 2; ring.position.y = 0.04; g.add(ring);
+    return g;
+  }
+  // Haz de luz de un faro sobre una fila de puntos
+  function beam(board, toW, LV, l, i) {
+    const g = new THREE.Group(); board.add(g);
+    const tex = (() => { const cv = document.createElement('canvas'); cv.width = 256; cv.height = 64; const x = cv.getContext('2d');
+      const gr = x.createLinearGradient(0, 0, 256, 0); gr.addColorStop(0, 'rgba(255,236,170,0.75)'); gr.addColorStop(1, 'rgba(255,236,170,0.08)');
+      x.fillStyle = gr; x.fillRect(0, 0, 256, 64); const v = x.createLinearGradient(0, 0, 0, 64); v.addColorStop(0, 'rgba(0,0,0,1)'); v.addColorStop(0.5, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,1)');
+      x.globalCompositeOperation = 'destination-out'; x.fillStyle = v; x.fillRect(0, 0, 256, 64); return new THREE.CanvasTexture(cv); })();
+    const m = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1.15), m); plane.rotation.x = -Math.PI / 2; plane.position.y = 0.06; g.add(plane);
+    const glowM = new THREE.MeshBasicMaterial({ color: 0xffe9a8, transparent: true, opacity: 0.16, depthWrite: false, blending: THREE.AdditiveBlending });
+    const cone = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.12, 1, 18, 1, true), glowM); g.add(cone);
+    const [dx, dy] = { E: [1, 0], W: [-1, 0], N: [0, -1], S: [0, 1] }[l.dir];
+    const first = l.beam[0].split(',').map(Number);
+    const src = toW(first[0] - dx * 0.95, first[1] - dy * 0.95);
+    const spot = new THREE.SpotLight(0xffe6a8, 1.6, 9, 0.38, 0.6, 1.2); spot.position.set(src.x, 0.9, src.z); board.add(spot, spot.target);
+    return {
+      set(t, crates) {
+        const on = !l.every || ((t + l.phase) % l.every + l.every) % l.every < l.on;
+        let n = 0; for (const k of l.beam) { if ((crates || []).includes(k) || LV.cover.has(k)) break; n++; }
+        g.visible = on && n > 0; spot.visible = on;
+        if (!on || !n) return;
+        const a = toW(first[0] - dx * 0.5, first[1] - dy * 0.5), last = l.beam[n - 1].split(',').map(Number), b = toW(last[0] + dx * 0.5, last[1] + dy * 0.5);
+        const len = Math.hypot(b.x - a.x, b.z - a.z), ang = Math.atan2(-(b.z - a.z), b.x - a.x);
+        plane.scale.set(len, 1, 1); plane.position.set((a.x + b.x) / 2, 0.06, (a.z + b.z) / 2); plane.rotation.z = ang;
+        cone.scale.set(1, len, 1); cone.position.set((a.x + b.x) / 2, 0.55, (a.z + b.z) / 2);
+        cone.rotation.set(0, 0, 0); cone.rotation.z = -Math.PI / 2; cone.rotation.y = ang; if (dx === 0) { cone.rotation.z = 0; cone.rotation.x = dy > 0 ? Math.PI / 2 : -Math.PI / 2; }
+        spot.target.position.set(b.x, 0, b.z);
+      },
+    };
+  }
+
+  function buildPlaya(scene, board, toW, LV, LVD, box, add, api) {
+    const [bx0, by0, bx1, by1] = box, W = (gx, gy) => toW(gx, gy);
+    // piso de ripio con huellas de camiones
+    const truck = (gx, gy, ry, color, lights) => { const t = add(camion(color), gx, gy, ry); const fix = () => paintTruck(t, color); fix(); api.tick.push(() => { if (!t.userData.painted && has('camion')) { fix(); t.userData.painted = true; } }); return t; };
+    // faros de los niveles con "lights": un camión detrás de cada haz
+    api.beams = (LVD.lights || []).map((l, i) => {
+      const L = LV.lights[i], [x, y] = l.from, [dx, dy] = { E: [1, 0], W: [-1, 0], N: [0, -1], S: [0, 1] }[l.dir];
+      const ry = { E: 0, W: Math.PI, N: Math.PI / 2, S: -Math.PI / 2 }[l.dir];
+      truck(x - dx * 1.75, y - dy * 1.75, ry, PAINTS[(i + 1) % PAINTS.length]);
+      return beam(board, toW, LV, L, i);
+    });
+    const pila = (gx, gy, ry = 0) => add(piece('pila', { s: 1.0 }, () => P.crate(0.9)), gx, gy, ry);
+    const tambor = (gx, gy, red) => add(piece(red ? 'tambor_rojo' : 'tambor_azul', { s: 0.8 }, () => P.barrel()), gx, gy, Math.random() * 3);
+    const poste = (gx, gy) => add(piece('poste_luz', { s: 0.85 }, () => P.farol(true)), gx, gy);
+    const pl = (gx, gy) => { const p = W(gx, gy), l = new THREE.PointLight(0xffc070, 0.9, 6, 2); l.position.set(p.x, 2.0, p.z); board.add(l); };
+    if (scene === 'bascula') {
+      add(piece('bascula', { s: 1.0 }, () => P.crate(1)), 2.2, by0 + 0.9);
+      truck(4.2, by0 + 0.55, Math.PI, PAINTS[0]);
+      add(piece('tranquera', { s: 0.9 }, null), bx0 + 0.3, 1.0, Math.PI / 2);
+      truck(bx0 + 0.6, by1 - 0.45, 0.15, PAINTS[2]);
+      pila(bx1 - 0.55, 1.0); pila(5.6, by1 - 0.4, 0.3); tambor(bx1 - 0.4, by0 + 0.4); tambor(bx1 - 0.7, by0 + 0.25, true);
+      add(alamo(false, 3), bx0 + 0.3, by0 + 0.3); add(alamo(false, 2.7), 1.0, by0 + 0.25); poste(3.0, 1.5);
+    }
+    if (scene === 'cajones') {
+      pila(bx0 + 0.45, by0 + 0.5); pila(1.0, by0 + 0.4, 0.4); pila(3.0, by0 + 0.45, -0.2); pila(bx1 - 0.5, 1.0); pila(bx1 - 0.45, by1 - 0.5, 0.5);
+      truck(5.4, by0 + 0.5, Math.PI, PAINTS[1]);
+      tambor(bx0 + 0.4, 1.5, true); tambor(bx0 + 0.35, 2.4); poste(2.5, 1.5); pl(2.5, 1.5);
+    }
+    if (scene === 'perros') {
+      // corral: alambrado alrededor de la zona de los perros, cuchas y tambores
+      LV.s0.en.filter(e => e.t === 'dog').forEach((d, i) => {
+        const [x, y] = d.home.split(',').map(Number);
+        add(piece('cucha', { s: 0.62 }, () => P.crate(0.5)), x - 0.5, y - 0.52, 0.6 + i * 0.5);
+      });
+      for (let gx = bx0 + 0.6; gx < bx1 - 0.4; gx += 1.0) add(piece('alambrado', { len: 2.0 }, null), gx + 0.5, by0 + 0.3);
+      add(alamo(false, 3), bx1 - 0.4, by0 + 0.4); add(alamo(false, 2.6), bx0 + 0.3, by1 - 0.5);
+      tambor(bx1 - 0.4, 2.0); tambor(bx1 - 0.5, 2.5, true); truck(bx0 + 0.55, by1 - 0.4, 0.2, PAINTS[3]); poste(2.5, 1.5);
+    }
+    if (scene === 'piedra') {
+      truck(1.0, by0 + 0.5, Math.PI, PAINTS[2]); truck(3.6, by0 + 0.55, Math.PI, PAINTS[0]);
+      truck(1.6, by1 - 0.45, 0, PAINTS[4]); truck(4.4, by1 - 0.5, 0.1, PAINTS[1]);
+      add(piece('surtidor', { s: 0.9 }, null), bx1 - 0.45, 1.0); tambor(bx1 - 0.45, 1.6, true); tambor(bx0 + 0.4, 1.5); poste(bx0 + 0.4, 0.6);
+    }
+    if (scene === 'faros') {
+      pila(3.0, by0 + 0.4); pila(bx1 - 0.6, by1 - 0.45, 0.4); tambor(bx1 - 0.6, by0 + 0.4, true); tambor(5.4, by0 + 0.3);
+      poste(1.5, by1 - 0.4); pl(1.5, by1 - 0.4); add(alamo(true, 2.8), bx0 + 0.3, by0 + 0.3);
+    }
+    if (scene === 'galpon') {
+      const g = add(piece('galpon_coop', { s: 1.0, keep: true }, () => P.station(8, 4.4, 2.4)), 3.0, by0 + 1.15);
+      const sg = sign('Cooperativa La Vendimia', 2.8, 0.28); sg.position.set(0, 2.99, 2.38); g.add(sg);
+      const l = new THREE.PointLight(0xffb060, 1.2, 7, 2); l.position.set(0, 1.4, 2.6); g.add(l);
+      pila(bx0 + 0.5, 1.5); pila(bx0 + 0.45, 3.2, 0.4); tambor(bx1 - 0.4, 1.5, true); tambor(bx1 - 0.45, 2.2);
+      poste(bx0 + 0.4, by1 - 0.4); pl(bx0 + 0.4, by1 - 0.4);
+    }
+    // luces cálidas para la noche
+    if (LVD.sky === 'noche' || LVD.sky === 'anochecer') { pl(1.5, 1.5); pl(4.5, 2.0); }
+  }
+
+  return { loadKit, build, has, applyKit, kitClone, crateMesh, stonePile };
 })();
 
 // ===== JUEGO: escena 3D, animaciones y controles =====
@@ -2503,7 +2965,7 @@ tri.moveTo(0, 0.2); tri.lineTo(-0.17, -0.12); tri.lineTo(0.17, -0.12); tri.lineT
 G.arrow = new THREE.ShapeGeometry(tri);
 
 // ---------- Estado de la partida ----------
-let decorTick = null, TDEC = null;
+let decorTick = null, TDEC = null, crateMeshes = new Map(), itemMeshes = new Map(), throwMode = false;
 let LVD = {}, idx = 0, LV, state, hist = [], busy = false, hintKey = null;
 let charKind = null;
 try { charKind = localStorage.getItem('sigilo-char'); } catch (e) {}
@@ -2545,7 +3007,7 @@ function buildLevel(i, opts = {}) {
   center = [(gx0 + gx1) / 2 * SP, (gy0 + gy1) / 2 * SP];
   const w = (gx1 - gx0) * SP, d = (gy1 - gy0) * SP;
   const themed = !!LVD.theme;
-  ext = { x0: -w / 2, x1: w / 2, z0: -d / 2, z1: d / 2, yTop: LVD.theme === 'anden' || LVD.theme === 'tren' ? 2.9 : themed ? 2.3 : 1.2, yBot: themed ? -1.6 : -0.7 };
+  ext = { x0: -w / 2, x1: w / 2, z0: -d / 2, z1: d / 2, yTop: LVD.theme === 'anden' || LVD.theme === 'tren' || LVD.theme === 'playa' ? 2.9 : themed ? 2.3 : 1.2, yBot: themed ? -1.6 : -0.7 };
 
   // Maqueta
   if (themed) {
@@ -2564,9 +3026,11 @@ function buildLevel(i, opts = {}) {
     noche: { hemi: [0xdde4ff, 0x3b3044, 0.62], sun: [0xc9d4ff, 0.55] },
     luna: { hemi: [0xc4d2ff, 0x2c2a3e, 0.66], sun: [0xc8d8ff, 0.7] },
     alba: { hemi: [0xffd9d2, 0x4a3a52, 0.8], sun: [0xffa58a, 0.95] },
+    dia: { hemi: [0xf4ecdc, 0x5a4c3c, 0.74], sun: [0xfff0d4, 1.0] },
   };
   const sky = LVD.sky || (themed ? 'noche' : 'dia');
   $('#stage').dataset.sky = sky;
+  M.stone.color.set(sky === 'dia' ? 0x9c9282 : sky === 'tarde' ? 0xb1a795 : 0xbdb5a5);   // de día los caminos encandilan
   const L = SKY[sky];
   if (L) { hemi.color.set(L.hemi[0]); hemi.groundColor.set(L.hemi[1]); hemi.intensity = L.hemi[2]; sun.color.set(L.sun[0]); sun.intensity = L.sun[1]; }
   else { hemi.color.set(0xdde4ff); hemi.groundColor.set(0x3b3044); hemi.intensity = 0.8; sun.color.set(0xfff0d8); sun.intensity = 0.85; }
@@ -2610,13 +3074,18 @@ function buildLevel(i, opts = {}) {
   if (LVD.theme === 'bodega') DECOR.bodega(board, toW, SP);
   if (LVD.theme === 'finca') DECOR.finca(board, toW, SP, LV, [gx0, gy0, gx1, gy1], LVD.extra);
   if (LVD.theme === 'anden') decorTick = DECOR.anden(board, toW, SP).update;
-  if (LVD.theme === 'tren') { TDEC = TREN.build(LVD.scene, board, toW, SP, LV, LVD, [gx0, gy0, gx1, gy1]); decorTick = TDEC.update; }
+  if (LVD.theme === 'tren' || LVD.theme === 'playa') { TDEC = TREN.build(LVD.scene, board, toW, SP, LV, LVD, [gx0, gy0, gx1, gy1]); decorTick = TDEC.update; }
+  // cajones que se empujan y piedras para juntar
+  crateMeshes = new Map(); itemMeshes = new Map(); throwMode = false;
+  for (const k of state.crates) { const c = TREN.crateMesh(); c.position.copy(wp(k)); c.rotation.y = (P(k)[0] * 7 + P(k)[1] * 3) % 4 * 0.06; board.add(c); crateMeshes.set(k, c); }
+  for (const k of state.items) { const st = TREN.stonePile(); st.position.copy(wp(k)); board.add(st); itemMeshes.set(k, st); }
+  updateStoneBtn();
   player = CHARS.build(charKind || 'pedro');
   player.scale.setScalar(FIG);
   player.userData.face = 0;
   board.add(player);
   $('.legend .me').style.background = '#' + new THREE.Color(chOf(player).color).getHexString();
-  const kindOf = e => e.t !== 'sentry' ? 'sereno' : e.turn ? (CHARS.has('vigia') ? 'vigia' : 'guarda') : (e.range || 1) === 1 ? 'vigia' : 'sereno';
+  const kindOf = e => e.t === 'dog' ? 'perro' : e.t !== 'sentry' ? 'sereno' : e.turn ? (CHARS.has('vigia') ? 'vigia' : 'guarda') : (e.range || 1) === 1 ? 'vigia' : 'sereno';
   enemyMeshes = state.en.map(e => { const m = CHARS.build(kindOf(e)); m.scale.setScalar(FIG); board.add(m); return m; });
   // barricas en los puntos que sirven de escondite
   for (const k of LV.cover) DECOR.coverSpot(board, wp(k), LVD.theme === 'tren' ? 'tren' : null);
@@ -2672,8 +3141,17 @@ function snap() {
       placeTied(m, i);
     }
   });
+  // cajones y piedras donde dice el estado (al deshacer o reiniciar)
+  if (crateMeshes.size) {
+    const ms = [...crateMeshes.values()]; crateMeshes = new Map();
+    state.crates.forEach((k, i) => { ms[i].position.copy(wp(k)); crateMeshes.set(k, ms[i]); });
+  }
+  itemMeshes.forEach((m, k) => { m.visible = state.items.includes(k); m.scale.setScalar(1); m.position.copy(wp(k)); });
+  if (TDEC && TDEC.setLights) TDEC.setLights(state.moves, state.crates);
+  throwMode = false; updateStoneBtn();
   if (state.over === 'caught') {
-    const a = state.by === 'train' ? wp(state.p).add(new THREE.Vector3(-(LV.trains[state.train].dir || 1), 0, 0)) : wp(state.en[state.by].pos), b = wp(state.p);
+    const a = state.by === 'train' ? wp(state.p).add(new THREE.Vector3(-(LV.trains[state.train].dir || 1), 0, 0))
+      : state.by === 'light' ? wp(LV.lights[state.light].beam[0]) : wp(state.en[state.by].pos), b = wp(state.p);
     chOf(player).mode = 'surprised';
     tipQuat(player, b.clone().sub(a).normalize(), 1, player.quaternion.clone());
   }
@@ -2754,7 +3232,7 @@ function badge(text, bg, fg, kind) {
     x.fillStyle = fg; x.textAlign = 'center'; x.textBaseline = 'middle';
     x.font = (text.length > 1 && text !== '↔' ? '600 50px' : '700 62px') + ' "Barlow Condensed", Arial, sans-serif';
     x.fillText(text, 64, 68);
-    if (kind === 'tren') { x.font = '600 18px "Barlow Condensed", Arial'; x.fillText('TREN', 64, 104); }
+    if (kind === 'tren' || kind === 'apaga' || kind === 'prende') { x.font = '600 18px "Barlow Condensed", Arial'; x.fillText(kind.toUpperCase(), 64, 104); }
     const t = new THREE.CanvasTexture(cv);
     BADGES[key] = new THREE.SpriteMaterial({ map: t, depthTest: false, transparent: true });
   }
@@ -2769,6 +3247,13 @@ function drawMarkers() {
   for (const e of state.en) {
     if (!e.alive) continue;
     if (e.t === 'patrol') for (const k of e.route) if (k !== e.pos) flat(G.dot, M.route, wp(k), 0.08);
+    if (e.t === 'dog') {
+      // hasta dónde huele el perro y hasta dónde llega su cadena
+      const dS = distances(LV, e.pos, state, e.smell + 1), dH = distances(LV, e.home, state, e.leash + 1);
+      for (const [k, d] of dS) if (d > 0 && d <= e.smell) flat(G.dot, M.dangerNext, wp(k), 0.09).scale.setScalar(1.35);
+      for (const [k, d] of dH) if (d === e.leash) flat(G.ring, M.route, wp(k), 0.085).scale.setScalar(0.55);
+      continue;
+    }
     const f = facing(LV, e), a = wp(e.pos);
     const nf = nextFacing(LV, e);
     if (nf && nf !== f) {
@@ -2782,7 +3267,7 @@ function drawMarkers() {
       markers.add(g2);
     }
     if (!f) continue;
-    const seen = sight(LV, e, state.moves);
+    const seen = sight(LV, e, state.moves, state);
     const b = wp(f);
     seen.forEach((k, i) => { const r = flat(G.dangerRing, M.danger, wp(k), 0.1); if (i) r.scale.setScalar(0.8); });
     if (!seen.length) flat(G.dot, M.danger, b, 0.1);   // la vista está tapada por una barrica
@@ -2801,6 +3286,19 @@ function drawMarkers() {
     const sp = badge(String(n), warn ? '#e5574a' : '#efe3c8', warn ? '#fff' : '#2b2117', 'tren'); sp.position.copy(p); markers.add(sp);
     if (warn) for (const k of tr.nodes) flat(G.dangerRing, M.danger, wp(k), 0.1).scale.setScalar(0.7);
   });
+  // faros: los que parpadean muestran en cuántos turnos cambian
+  (LV.lights || []).forEach(l => {
+    const lit = litNodes(LV, l, state.moves, state);
+    for (const k of lit) flat(G.dangerRing, M.danger, wp(k), 0.1).scale.setScalar(0.7);
+    if (!l.every) return;
+    const on = lightOn(l, state.moves); let n = 1; while (n < l.every && lightOn(l, state.moves + n) === on) n++;
+    const [x, y] = P(l.beam[0]), p = wp(l.beam[0]);
+    const sp = badge(String(n), on ? '#e5574a' : '#efe3c8', on ? '#fff' : '#2b2117', on ? 'apaga' : 'prende'); sp.position.set(p.x, 1.25, p.z); markers.add(sp);
+  });
+  // tirar una piedra: los puntos a los que llega
+  if (throwMode && !state.over && !busy) for (const k of throwTargets(LV, state)) {
+    const r = flat(G.ring, M.hint, wp(k), 0.12); r.scale.setScalar(0.85);
+  }
   // puertas: abiertas (verde) o cuántos turnos faltan para que se abran
   (LV.doors || []).forEach(d => {
     const a = wp(d.a), b = wp(d.b), open = doorOpen(d, state.moves);
@@ -2887,17 +3385,50 @@ async function caughtAnim(m, ePos, pPos) {
 
 async function playTurn(prev, r) {
   const ev = r.ev;
-  const pm = ev.find(e => e.k === 'pmove');
-  const from = wp(pm.from), to = wp(pm.to);
-  const dir = to.clone().sub(from).normalize();
   const pc = chOf(player);
-  if (pm.blocked) {
+  const th = ev.find(e => e.k === 'throw');
+  const pm = ev.find(e => e.k === 'pmove') || { from: prev.p, to: prev.p };
+  const from = wp(pm.from), to = wp(pm.to);
+  const dir = th ? new THREE.Vector3(0, 0, 1) : to.clone().sub(from).normalize();
+  const push = ev.find(e => e.k === 'push'), pick = ev.find(e => e.k === 'pick');
+  if (th) {
+    // la piedra vuela en arco y hace ruido donde cae
+    const a = wp(th.from), b = wp(th.at);
+    await turnTo(player, angleOf(b.x - a.x, b.z - a.z), 140);
+    pc.mode = 'push';
+    const st = new THREE.Mesh(new THREE.DodecahedronGeometry(0.09, 0), new THREE.MeshStandardMaterial({ color: 0x8e8a80, flatShading: true }));
+    st.castShadow = true; board.add(st);
+    const h = 1.2 + a.distanceTo(b) * 0.12;
+    await tween(520, u => { st.position.lerpVectors(a, b, u); st.position.y = a.y + 1.1 * (1 - u) + Math.sin(Math.PI * u) * h; st.rotation.x += 0.3; });
+    pc.mode = 'idle';
+    const ring = new THREE.Mesh(G.ring, new THREE.MeshBasicMaterial({ color: 0xfff1c4, transparent: true, opacity: 0.9, depthWrite: false }));
+    ring.rotation.x = -Math.PI / 2; ring.position.set(b.x, b.y + 0.1, b.z); board.add(ring);
+    const alerted = ev.filter(e => e.k === 'alert');
+    const marks = alerted.map(e => { const sp = badge('!', '#f1d07a', '#2b2117', 'alerta'); const m = enemyMeshes[e.id]; sp.position.set(m.position.x, m.position.y + 1.6, m.position.z); sp.scale.set(0.5, 0.5, 1); board.add(sp); return sp; });
+    await Promise.all([
+      tween(420, u => { ring.scale.setScalar(0.6 + u * 1.8); ring.material.opacity = 0.9 * (1 - u); st.position.y = b.y + 0.06; }),
+      ...alerted.map(e => { const en = r.s.en[e.id]; if (en.t !== 'sentry') return null; const [dx, dz] = faceVec(LV, en); return turnTo(enemyMeshes[e.id], angleOf(dx, dz), 260); }),
+    ]);
+    board.remove(ring); setTimeout(() => { board.remove(st); marks.forEach(m => board.remove(m)); }, 900);
+  } else if (pm.blocked) {
     const mid = from.clone().lerp(to, 0.38);
     await walkTo(player, from, mid, 240);
     pc.mode = 'walk';
     await tween(220, u => { player.position.lerpVectors(mid, from, smooth(u)); });
     pc.mode = 'idle';
-  } else await walkTo(player, from, to);
+  } else if (push) {
+    // empuja el cajón: camina detrás y el cajón se corre un casillero
+    const cm = crateMeshes.get(push.from); crateMeshes.delete(push.from); crateMeshes.set(push.to, cm);
+    const c0 = wp(push.from), c1 = wp(push.to);
+    pc.mode = 'push';
+    await Promise.all([walkTo(player, from, to, 560), tween(560, u => { cm && cm.position.lerpVectors(c0, c1, smooth(u)); })]);
+    pc.mode = 'idle';
+  } else if (!th) await walkTo(player, from, to);
+  if (pick) {   // junta la piedra
+    const m = itemMeshes.get(pick.at), p0 = m.position.clone();
+    await tween(300, u => { m.position.y = p0.y + Math.sin(Math.PI * u) * 0.6 + u * 0.4; m.scale.setScalar(1 - u); });
+    m.visible = false;
+  }
   const td = ev.find(e => e.k === 'takedown');
   if (td) {
     pc.mode = 'push';
@@ -2917,6 +3448,11 @@ async function playTurn(prev, r) {
     return turnTo(enemyMeshes[i], angleOf(dx, dz));
   }));
   if (TDEC) TDEC.setDoors(r.s.moves, true, tween);
+  if (TDEC && TDEC.setLights) TDEC.setLights(r.s.moves, r.s.crates);
+  const barks = ev.filter(e => e.k === 'bark');
+  if (barks.length) { barks.forEach(b => { chOf(enemyMeshes[b.id]).mode = 'bark'; }); await tween(380, () => {}); barks.forEach(b => { chOf(enemyMeshes[b.id]).mode = 'idle'; }); }
+  const lightHit = caught && caught.light !== undefined;
+  if (lightHit) { pc.mode = 'surprised'; await tween(500, () => {}); }
   const trainsEv = ev.filter(e => e.k === 'train');
   if (trainsEv.length && TDEC) {
     const hitTr = caught && caught.train !== undefined;
@@ -2931,7 +3467,10 @@ async function playTurn(prev, r) {
   }
   if (caught && caught.id !== undefined) {
     const e = r.s.en[caught.id];
-    await caughtAnim(enemyMeshes[caught.id], wp(e.pos), wp(r.s.p));
+    if (e.t === 'dog') {   // el perro muerde
+      const dm = enemyMeshes[caught.id]; chOf(dm).mode = 'push'; pc.mode = 'surprised';
+      await tween(520, () => {});
+    } else await caughtAnim(enemyMeshes[caught.id], wp(e.pos), wp(r.s.p));
   }
   if (ev.some(e => e.k === 'win')) {
     pc.mode = 'cheer';
@@ -2945,7 +3484,12 @@ async function playTurn(prev, r) {
 async function tryMove(to) {
   if (busy || state.over) return;
   const r = step(LV, state, to);
-  if (!r) { if (LV.adj.get(state.p).has(to)) toast('La puerta está cerrada. Mirá el número: en esos turnos se abre.'); return; }
+  if (!r) {
+    if (state.crates.includes(to)) toast('El cajón no se puede correr para ese lado: algo lo traba.');
+    else if (LV.adj.get(state.p).has(to)) toast('La puerta está cerrada. Mirá el número: en esos turnos se abre.');
+    return;
+  }
+  throwMode = false;
   hist.push(state);
   const prev = state;
   state = r.s; hintKey = null; busy = true;
@@ -2954,7 +3498,7 @@ async function tryMove(to) {
   drawMarkers();
   updateHud();
   await playTurn(prev, r);
-  busy = false;
+  busy = false; updateStoneBtn();
   drawMarkers();
   afterTurn();
 }
@@ -2976,6 +3520,16 @@ function afterTurn() {
       : `Lo hiciste en ${n} movidas. El camino más corto tiene ${min}.`;
     $('#winNext').textContent = idx < LEVELS.length - 1 ? 'Siguiente' : 'Ver niveles';
     $('#winBox').hidden = false;
+  } else if (state.over === 'caught' && state.by === 'light') {
+    const who = chOf(player).name;
+    $('#lostTitle').textContent = `Los faros iluminaron a ${who}`;
+    $('#lostTxt').textContent = 'No te quedes en la luz de un camión. Un cajón corta el haz, y el que parpadea avisa en cuántos turnos se apaga.';
+    $('#lostBox').hidden = false;
+  } else if (state.over === 'caught' && state.en[state.by] && state.en[state.by].t === 'dog') {
+    const who = chOf(player).name;
+    $('#lostTitle').textContent = `El perro alcanzó a ${who}`;
+    $('#lostTxt').textContent = 'Si pasás a dos casilleros o menos, el perro te sigue. Pero su cadena no da más que hasta el círculo: alejalo y rodealo, o distraelo con una piedra.';
+    $('#lostBox').hidden = false;
   } else if (state.over === 'caught' && state.by === 'train') {
     const who = chOf(player).name;
     $('#lostTitle').textContent = `La máquina pasó por encima de ${who}`;
@@ -3015,6 +3569,7 @@ function hint() {
   const r = solve(LV, state);
   if (r && r.path) {
     hintKey = r.path[0];
+    if (hintKey.startsWith('T:')) { hintKey = hintKey.slice(2); throwMode = true; updateStoneBtn(); drawMarkers(); toast(`Tirá la piedra al punto dorado. Te faltan ${r.path.length} movidas.`); return; }
     drawMarkers();
     toast(`Andá al punto dorado. Te faltan ${r.path.length} movidas.`);
   } else {
@@ -3071,6 +3626,22 @@ function openLevels() {
 $('#bUndo').onclick = undo;
 $('#bRestart').onclick = restart;
 $('#bHint').onclick = hint;
+// Botón de la piedra: aparece en los niveles con piedras
+function updateStoneBtn() {
+  const b = $('#bStone'); if (!b) return;
+  const show = !!(LVD.stones || LVD.carry);
+  b.hidden = !show;
+  if (!show) return;
+  b.disabled = busy || !!state.over || !state.stones;
+  b.classList.toggle('on', throwMode);
+  $('#stoneN').textContent = state.stones || 0;
+}
+function toggleThrow() {
+  if (busy || state.over || !state.stones) { if (!state.stones) toast('Primero juntá una piedra del suelo.'); return; }
+  throwMode = !throwMode; updateStoneBtn(); drawMarkers();
+  if (throwMode) toast('Tocá un punto dorado para tirar la piedra. Los guardias de al lado miran el ruido.');
+}
+$('#bStone').onclick = toggleThrow;
 $('#bLevels').onclick = openLevels;
 $('#lvClose').onclick = () => { $('#lvSheet').hidden = true; };
 $('#lostUndo').onclick = undo;
@@ -3117,6 +3688,11 @@ canvas.addEventListener('pointerup', e => {
   ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
   ray.setFromCamera(ptr, cam);
   const hits = ray.intersectObjects(hitMeshes, false);
+  if (throwMode) {
+    const tg = throwTargets(LV, state), h = hits.find(x => tg.includes(x.object.userData.k));
+    if (h) tryMove('T:' + h.object.userData.k); else { throwMode = false; updateStoneBtn(); drawMarkers(); }
+    return;
+  }
   // elegir el punto vecino más cercano al toque
   const nb = LV.adj.get(state.p);
   const h = hits.find(x => nb.has(x.object.userData.k));
@@ -3124,6 +3700,7 @@ canvas.addEventListener('pointerup', e => {
 });
 // Teclado: flechas o WASD, Z deshacer, R reiniciar, H pista
 window.addEventListener('keydown', e => {
+  if (e.key === 'p' || e.key === 'P') { toggleThrow(); return; }
   const map = { ArrowUp: 'N', w: 'N', ArrowDown: 'S', s: 'S', ArrowLeft: 'W', a: 'W', ArrowRight: 'E', d: 'E' };
   const dir = map[e.key];
   if (dir) {
@@ -3227,7 +3804,7 @@ function threatPoints(box) {
   const pts = [];
   for (const e of state.en) {
     if (!e.alive) continue;
-    const f = facing(LV, e), seen = sight(LV, e, state.moves);
+    const f = facing(LV, e), seen = sight(LV, e, state.moves, state);
     let near = inBox(e.pos, box, 0.5) || seen.some(k => inBox(k, box));
     if (!near && e.t === 'patrol') {
       let ri = e.ri, rd = e.rdir;
@@ -3437,7 +4014,8 @@ CHARS.onModel = kind => {
   // Guardias: se reemplazan en el mismo lugar y con la misma orientación
   if ((kind === 'vigia' || kind === 'sereno') && board && !busy && state) {
     enemyMeshes = enemyMeshes.map((m, i) => {
-      const e = state.en[i], want = e.t === 'sentry' && (e.range || 1) === 1 ? 'vigia' : 'sereno';
+      const e = state.en[i]; if (e.t === 'dog') return m;
+      const want = e.t === 'sentry' && (e.range || 1) === 1 ? 'vigia' : 'sereno';
       if (want !== kind) return m;
       const n = CHARS.build(kind); n.scale.copy(m.scale); n.position.copy(m.position); n.quaternion.copy(m.quaternion);
       n.userData.face = m.userData.face; chOf(n).mode = chOf(m).mode;
@@ -3460,6 +4038,7 @@ CHARS.loadModel('zorro', 'zorro_model.js');
 CHARS.loadModel('corona', 'corona_model.js');
 DECOR.loadProps('escenario_model.js');
 TREN.loadKit('trasandino_model.js');
+TREN.loadKit('playa_model.js', () => CHARS.notify('perro'), 'KIT_PLAYA');
 window.claude?.hot?.snapshot?.(() => ({ ch: charKind, li: idx, path: hist.concat([state]).slice(1).map(s => s.p) }));
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
 

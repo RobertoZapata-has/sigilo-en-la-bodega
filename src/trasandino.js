@@ -12,11 +12,11 @@ const TREN = (() => {
   let slots = [];
 
   // ---------- carga de piezas ----------
-  function loadKit(url, done) {
+  function loadKit(url, done, varName = 'KIT_B64') {
     if (!THREE.GLTFLoader) return;
     const s = document.createElement('script'); s.src = url; s.async = true;
     s.onload = () => {
-      const all = window.KIT_B64 || {}; delete window.KIT_B64;
+      const all = window[varName] || {}; delete window[varName];
       const names = Object.keys(all); let left = names.length;
       const fin = () => { if (--left === 0) { applyKit(); if (done) done(); } };
       names.forEach(n => {
@@ -79,6 +79,11 @@ const TREN = (() => {
       }
       const w = new THREE.Group(); w.add(o); w.position.y = opt.y || 0; return w;
     });
+  }
+
+  function kitClone(name) {
+    if (!has(name)) return null;
+    const o = clone(name), w = new THREE.Group(); w.add(o); return w;
   }
 
   // ---------- piezas sueltas ----------
@@ -367,6 +372,9 @@ const TREN = (() => {
       snowPatches(board, toW, [3.8, by0 + 0.2, bx1 - 0.3, by1 - 0.2], 7, 9);
     }
 
+    // ===== CAPÍTULO 3: LA PLAYA DE CAMIONES =====
+    if (LVD.theme === 'playa') buildPlaya(scene, board, toW, LV, LVD, box, add, api);
+
     // los trenes de paso: se arman una vez y se esconden hasta que pasan
     api.trains.forEach((tr, i) => {
       const set = trainSet([['loco'], ['furgon', 3.2], ['furgon', 3.2]]);
@@ -377,6 +385,8 @@ const TREN = (() => {
     let tNow = 0;
     return {
       update(t) { tNow = t; api.tick.forEach(f => f(t)); api.trains.forEach(tr => { if (tr.set.visible) tr.set.userData.parts[0].userData.smoke(t, 2.5); }); },
+      // faros: prende o apaga cada haz y lo corta donde hay un cajón
+      setLights(t, crates) { (api.beams || []).forEach(b => b.set(t, crates)); },
       // el tren cruza de punta a punta (dir 1: de izquierda a derecha)
       passTrain(i, tween) {
         const tr = api.trains[i]; if (!tr) return Promise.resolve();
@@ -400,5 +410,115 @@ const TREN = (() => {
     };
   }
 
-  return { loadKit, build, has, applyKit };
+  // ---------- piezas del capítulo 3 ----------
+  const PAINTS = [0x4f8c8a, 0x9a3b2a, 0xc9a33a, 0x5b6f8f, 0x6f8a4a];
+  function camion(color, lightsOn = false) {
+    return piece('camion', { s: 0.92 }, () => {
+      const g = new THREE.Group(), m = mat(color || 0x4f8c8a, { roughness: 0.5 });
+      const cab = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.2, 1.3), m); cab.position.set(0.9, 0.95, 0); g.add(cab);
+      const bed = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.7, 1.4), mat(0x9a7046)); bed.position.set(-0.9, 0.9, 0); g.add(bed);
+      return shadow(g);
+    });
+  }
+  function paintTruck(g, color) {   // cada camión de otro color: se clona el material de la pintura
+    g.traverse(o => { if (o.isMesh && o.material && o.material.name === 'sk_camion_pintura') { o.material = o.material.clone(); o.material.color.set(color); } });
+  }
+  function crateMesh() { return piece('cajon', { s: 1.05 }, () => { const g = P.crate(0.75); return g; }); }
+  function stonePile() {
+    const g = new THREE.Group(), m = mat(0x8e8a80, { roughness: 0.9, flatShading: true });
+    [[0, 0, 0.1], [0.12, 0.06, 0.07], [-0.1, 0.08, 0.06], [0.04, -0.1, 0.065]].forEach(([x, z, r]) => { const st = new THREE.Mesh(new THREE.DodecahedronGeometry(r, 0), m); st.position.set(x, r * 0.7, z); st.castShadow = true; g.add(st); });
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.26, 0.31, 32), new THREE.MeshBasicMaterial({ color: 0xd8b25e, transparent: true, opacity: 0.8 }));
+    ring.rotation.x = -Math.PI / 2; ring.position.y = 0.04; g.add(ring);
+    return g;
+  }
+  // Haz de luz de un faro sobre una fila de puntos
+  function beam(board, toW, LV, l, i) {
+    const g = new THREE.Group(); board.add(g);
+    const tex = (() => { const cv = document.createElement('canvas'); cv.width = 256; cv.height = 64; const x = cv.getContext('2d');
+      const gr = x.createLinearGradient(0, 0, 256, 0); gr.addColorStop(0, 'rgba(255,236,170,0.75)'); gr.addColorStop(1, 'rgba(255,236,170,0.08)');
+      x.fillStyle = gr; x.fillRect(0, 0, 256, 64); const v = x.createLinearGradient(0, 0, 0, 64); v.addColorStop(0, 'rgba(0,0,0,1)'); v.addColorStop(0.5, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,1)');
+      x.globalCompositeOperation = 'destination-out'; x.fillStyle = v; x.fillRect(0, 0, 256, 64); return new THREE.CanvasTexture(cv); })();
+    const m = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1.15), m); plane.rotation.x = -Math.PI / 2; plane.position.y = 0.06; g.add(plane);
+    const glowM = new THREE.MeshBasicMaterial({ color: 0xffe9a8, transparent: true, opacity: 0.16, depthWrite: false, blending: THREE.AdditiveBlending });
+    const cone = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.12, 1, 18, 1, true), glowM); g.add(cone);
+    const [dx, dy] = { E: [1, 0], W: [-1, 0], N: [0, -1], S: [0, 1] }[l.dir];
+    const first = l.beam[0].split(',').map(Number);
+    const src = toW(first[0] - dx * 0.95, first[1] - dy * 0.95);
+    const spot = new THREE.SpotLight(0xffe6a8, 1.6, 9, 0.38, 0.6, 1.2); spot.position.set(src.x, 0.9, src.z); board.add(spot, spot.target);
+    return {
+      set(t, crates) {
+        const on = !l.every || ((t + l.phase) % l.every + l.every) % l.every < l.on;
+        let n = 0; for (const k of l.beam) { if ((crates || []).includes(k) || LV.cover.has(k)) break; n++; }
+        g.visible = on && n > 0; spot.visible = on;
+        if (!on || !n) return;
+        const a = toW(first[0] - dx * 0.5, first[1] - dy * 0.5), last = l.beam[n - 1].split(',').map(Number), b = toW(last[0] + dx * 0.5, last[1] + dy * 0.5);
+        const len = Math.hypot(b.x - a.x, b.z - a.z), ang = Math.atan2(-(b.z - a.z), b.x - a.x);
+        plane.scale.set(len, 1, 1); plane.position.set((a.x + b.x) / 2, 0.06, (a.z + b.z) / 2); plane.rotation.z = ang;
+        cone.scale.set(1, len, 1); cone.position.set((a.x + b.x) / 2, 0.55, (a.z + b.z) / 2);
+        cone.rotation.set(0, 0, 0); cone.rotation.z = -Math.PI / 2; cone.rotation.y = ang; if (dx === 0) { cone.rotation.z = 0; cone.rotation.x = dy > 0 ? Math.PI / 2 : -Math.PI / 2; }
+        spot.target.position.set(b.x, 0, b.z);
+      },
+    };
+  }
+
+  function buildPlaya(scene, board, toW, LV, LVD, box, add, api) {
+    const [bx0, by0, bx1, by1] = box, W = (gx, gy) => toW(gx, gy);
+    // piso de ripio con huellas de camiones
+    const truck = (gx, gy, ry, color, lights) => { const t = add(camion(color), gx, gy, ry); const fix = () => paintTruck(t, color); fix(); api.tick.push(() => { if (!t.userData.painted && has('camion')) { fix(); t.userData.painted = true; } }); return t; };
+    // faros de los niveles con "lights": un camión detrás de cada haz
+    api.beams = (LVD.lights || []).map((l, i) => {
+      const L = LV.lights[i], [x, y] = l.from, [dx, dy] = { E: [1, 0], W: [-1, 0], N: [0, -1], S: [0, 1] }[l.dir];
+      const ry = { E: 0, W: Math.PI, N: Math.PI / 2, S: -Math.PI / 2 }[l.dir];
+      truck(x - dx * 1.75, y - dy * 1.75, ry, PAINTS[(i + 1) % PAINTS.length]);
+      return beam(board, toW, LV, L, i);
+    });
+    const pila = (gx, gy, ry = 0) => add(piece('pila', { s: 1.0 }, () => P.crate(0.9)), gx, gy, ry);
+    const tambor = (gx, gy, red) => add(piece(red ? 'tambor_rojo' : 'tambor_azul', { s: 0.8 }, () => P.barrel()), gx, gy, Math.random() * 3);
+    const poste = (gx, gy) => add(piece('poste_luz', { s: 0.85 }, () => P.farol(true)), gx, gy);
+    const pl = (gx, gy) => { const p = W(gx, gy), l = new THREE.PointLight(0xffc070, 0.9, 6, 2); l.position.set(p.x, 2.0, p.z); board.add(l); };
+    if (scene === 'bascula') {
+      add(piece('bascula', { s: 1.0 }, () => P.crate(1)), 2.2, by0 + 0.9);
+      truck(4.2, by0 + 0.55, Math.PI, PAINTS[0]);
+      add(piece('tranquera', { s: 0.9 }, null), bx0 + 0.3, 1.0, Math.PI / 2);
+      truck(bx0 + 0.6, by1 - 0.45, 0.15, PAINTS[2]);
+      pila(bx1 - 0.55, 1.0); pila(5.6, by1 - 0.4, 0.3); tambor(bx1 - 0.4, by0 + 0.4); tambor(bx1 - 0.7, by0 + 0.25, true);
+      add(alamo(false, 3), bx0 + 0.3, by0 + 0.3); add(alamo(false, 2.7), 1.0, by0 + 0.25); poste(3.0, 1.5);
+    }
+    if (scene === 'cajones') {
+      pila(bx0 + 0.45, by0 + 0.5); pila(1.0, by0 + 0.4, 0.4); pila(3.0, by0 + 0.45, -0.2); pila(bx1 - 0.5, 1.0); pila(bx1 - 0.45, by1 - 0.5, 0.5);
+      truck(5.4, by0 + 0.5, Math.PI, PAINTS[1]);
+      tambor(bx0 + 0.4, 1.5, true); tambor(bx0 + 0.35, 2.4); poste(2.5, 1.5); pl(2.5, 1.5);
+    }
+    if (scene === 'perros') {
+      // corral: alambrado alrededor de la zona de los perros, cuchas y tambores
+      LV.s0.en.filter(e => e.t === 'dog').forEach((d, i) => {
+        const [x, y] = d.home.split(',').map(Number);
+        add(piece('cucha', { s: 0.62 }, () => P.crate(0.5)), x - 0.5, y - 0.52, 0.6 + i * 0.5);
+      });
+      for (let gx = bx0 + 0.6; gx < bx1 - 0.4; gx += 1.0) add(piece('alambrado', { len: 2.0 }, null), gx + 0.5, by0 + 0.3);
+      add(alamo(false, 3), bx1 - 0.4, by0 + 0.4); add(alamo(false, 2.6), bx0 + 0.3, by1 - 0.5);
+      tambor(bx1 - 0.4, 2.0); tambor(bx1 - 0.5, 2.5, true); truck(bx0 + 0.55, by1 - 0.4, 0.2, PAINTS[3]); poste(2.5, 1.5);
+    }
+    if (scene === 'piedra') {
+      truck(1.0, by0 + 0.5, Math.PI, PAINTS[2]); truck(3.6, by0 + 0.55, Math.PI, PAINTS[0]);
+      truck(1.6, by1 - 0.45, 0, PAINTS[4]); truck(4.4, by1 - 0.5, 0.1, PAINTS[1]);
+      add(piece('surtidor', { s: 0.9 }, null), bx1 - 0.45, 1.0); tambor(bx1 - 0.45, 1.6, true); tambor(bx0 + 0.4, 1.5); poste(bx0 + 0.4, 0.6);
+    }
+    if (scene === 'faros') {
+      pila(3.0, by0 + 0.4); pila(bx1 - 0.6, by1 - 0.45, 0.4); tambor(bx1 - 0.6, by0 + 0.4, true); tambor(5.4, by0 + 0.3);
+      poste(1.5, by1 - 0.4); pl(1.5, by1 - 0.4); add(alamo(true, 2.8), bx0 + 0.3, by0 + 0.3);
+    }
+    if (scene === 'galpon') {
+      const g = add(piece('galpon_coop', { s: 1.0, keep: true }, () => P.station(8, 4.4, 2.4)), 3.0, by0 + 1.15);
+      const sg = sign('Cooperativa La Vendimia', 2.8, 0.28); sg.position.set(0, 2.99, 2.38); g.add(sg);
+      const l = new THREE.PointLight(0xffb060, 1.2, 7, 2); l.position.set(0, 1.4, 2.6); g.add(l);
+      pila(bx0 + 0.5, 1.5); pila(bx0 + 0.45, 3.2, 0.4); tambor(bx1 - 0.4, 1.5, true); tambor(bx1 - 0.45, 2.2);
+      poste(bx0 + 0.4, by1 - 0.4); pl(bx0 + 0.4, by1 - 0.4);
+    }
+    // luces cálidas para la noche
+    if (LVD.sky === 'noche' || LVD.sky === 'anochecer') { pl(1.5, 1.5); pl(4.5, 2.0); }
+  }
+
+  return { loadKit, build, has, applyKit, kitClone, crateMesh, stonePile };
 })();

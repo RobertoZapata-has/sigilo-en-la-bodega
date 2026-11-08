@@ -82,6 +82,14 @@ button:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 3px; }
     radial-gradient(1px 1px at 93% 30%, rgba(255,255,255,.5), transparent 60%),
     linear-gradient(180deg, #0b1230 0%, #1d2a5a 55%, #44507e 88%, #6a6f93 100%);
 }
+.stage[data-sky="dia"] {
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 120' preserveAspectRatio='none'><path d='M0 120 L0 70 L30 48 L58 60 L92 18 L126 46 L150 34 L190 64 L226 22 L258 50 L296 10 L336 54 L364 40 L400 62 L400 120 Z' fill='%238d93b8'/><path d='M92 18 L106 32 L96 30 L86 28 L80 30 Z M226 22 L238 34 L228 33 L218 31 Z M296 10 L312 26 L300 24 L288 22 L282 25 Z M150 34 L158 40 L148 40 Z' fill='%23ffffff' opacity='.95'/></svg>") bottom / 100% 34% no-repeat,
+    radial-gradient(circle at 82% 14%, rgba(255,250,230,.95) 0 2.6%, rgba(255,244,210,.35) 4%, transparent 14%),
+    radial-gradient(ellipse 30% 8% at 22% 22%, rgba(255,255,255,.75), transparent 70%),
+    radial-gradient(ellipse 24% 6% at 62% 30%, rgba(255,255,255,.55), transparent 70%),
+    linear-gradient(180deg, #3d7fc4 0%, #74aee0 50%, #bcd9ef 82%, #e8eef0 100%);
+}
 .stage[data-sky="alba"] {
   background:
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 120' preserveAspectRatio='none'><path d='M0 120 L0 70 L30 48 L58 60 L92 18 L126 46 L150 34 L190 64 L226 22 L258 50 L296 10 L336 54 L364 40 L400 62 L400 120 Z' fill='%234a3a62'/><path d='M92 18 L106 32 L96 30 L86 28 L80 30 Z M226 22 L238 34 L228 33 L218 31 Z M296 10 L312 26 L300 24 L288 22 L282 25 Z M150 34 L158 40 L148 40 Z' fill='%23eef2ff' opacity='.85'/></svg>") bottom / 100% 34% no-repeat,
@@ -237,6 +245,12 @@ canvas#c { position: absolute; inset: 0; width: 100%; height: 100%; display: blo
 #chapBox.has-art { background: linear-gradient(180deg, rgba(9,11,24,.35) 0%, rgba(9,11,24,.55) 40%, rgba(9,11,24,.94) 78%), var(--art) center / cover no-repeat, var(--night); place-items: end center; padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px)); }
 #chapBox.has-art .chapter p { color: #ece6f6; text-shadow: 0 1px 8px rgba(0,0,0,.6); }
 #chapBox.has-art .chapter h2 { text-shadow: 0 3px 18px rgba(0,0,0,.6); }
+
+/* botón de la piedra */
+.db.stone .ic { position: relative; }
+.db.stone .cnt { position: absolute; right: -6px; top: -6px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--gold-hi, #f1d07a); color: #2b2117; font: 700 11px/18px var(--label, sans-serif); text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,.4); }
+.db.stone.on .ic { background: rgba(241,208,122,.25); box-shadow: 0 0 0 2px var(--gold-hi, #f1d07a) inset; }
+.db.stone:disabled .cnt { opacity: .5; }
 
 /* postal del lugar */
 .postal {
@@ -398,6 +412,7 @@ canvas#c { position: absolute; inset: 0; width: 100%; height: 100%; display: blo
       <button class="db" id="bUndo"><span class="ic"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span><span class="lb">Deshacer</span></button>
       <button class="db" id="bRestart"><span class="ic"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span><span class="lb">Reiniciar</span></button>
       <button class="db gold" id="bHint"><span class="ic"><svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg></span><span class="lb">Pista</span></button>
+      <button class="db stone" id="bStone" hidden><span class="ic"><svg viewBox="0 0 24 24"><path d="M5 15c0-4 3-8 7-8 3.5 0 7 2.6 7 6.5 0 3-2.6 5.5-7 5.5-4.4 0-7-1.4-7-4z"/><path d="M9 11.5c1-.8 2-1.2 3.2-1.2"/></svg><b class="cnt" id="stoneN">0</b></span><span class="lb">Piedra</span></button>
       <button class="db" id="bMap" aria-pressed="false" hidden><span class="ic"><svg viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14"/><path d="M15 6v14"/></svg></span><span class="lb">Mapa</span></button>
       <button class="db" id="bLevels"><span class="ic"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/><circle cx="19" cy="18" r="1.5"/></svg></span><span class="lb">Ruta</span></button>
     </nav>

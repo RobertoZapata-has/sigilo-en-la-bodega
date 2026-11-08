@@ -1,7 +1,7 @@
 // Service worker: guarda el juego en el celular para jugar sin internet.
-const CACHE = 'sigilo-202611080912';
+const CACHE = 'sigilo-202611080954';
 const LOCAL = ['./', 'index.html', 'manifest.json', 'pedro_model.js', 'clara_model.js', 'vigia_model.js', 'sereno_model.js',
-  'zorro_model.js', 'corona_model.js', 'escenario_model.js', 'trasandino_model.js', 'icons/icon-192.png', 'icons/icon-512.png'];
+  'zorro_model.js', 'corona_model.js', 'escenario_model.js', 'trasandino_model.js', 'playa_model.js', 'icons/icon-192.png', 'icons/icon-512.png'];
 const CDN = ['https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
   'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js',
   'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/utils/SkeletonUtils.js'];
